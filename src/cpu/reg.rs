@@ -85,6 +85,45 @@ impl Register {
         self.r14 = sp;
     }
 
+    //------------------------------------flag-----------------------------------//
+    /// negative 负
+    pub fn flag_n(&self) -> bool { self.cspr & 0x8000_0000 != 0 }
+
+    /// ZERO
+    pub fn flag_z(&self) -> bool { self.cspr & 0x4000_0000 != 0 }
+
+    /// Carry 进位
+    pub fn flag_c(&self) -> bool { self.cspr & 0x2000_0000 != 0 }
+
+    /// Overflow 溢出位
+    pub fn flag_v(&self) -> bool { self.cspr & 0x1000_0000 != 0 }
+
+    /// negative 负
+    pub fn set_flag_n(&mut self, r: bool) {
+        self.cspr = if r { self.cspr | 0x8000_0000 } else { self.cspr & 0x7FFF_FFFF }
+    }
+
+    /// ZERO
+    pub fn set_flag_z(&mut self, r: bool) {
+        self.cspr = if r { self.cspr | 0x4000_0000 } else { self.cspr & 0xBFFF_FFFF }
+    }
+
+    /// Carry 进位
+    pub fn set_flag_c(&mut self, r: bool) {
+        self.cspr = if r { self.cspr | 0x2000_0000 } else { self.cspr & 0xDFFFFFFF }
+    }
+
+    /// Overflow 溢出位
+    pub fn set_flag_v(&mut self, r: bool) {
+        self.cspr = if r { self.cspr | 0x1000_0000 } else { self.cspr & 0xEFFF_FFFF }
+    }
+    //------------------------------------flag-----------------------------------//
+
+    //-----------------------------------Control---------------------------------//
+
+    //-----------------------------------Control---------------------------------//
+
+
     pub fn new() -> Self {
         Self {
             r0: 0,
@@ -126,4 +165,9 @@ impl Register {
             spsr_fiq: 0,
         }
     }
+}
+
+pub enum OpMode {
+    Thumb = 1,
+    ARM = 0,
 }
