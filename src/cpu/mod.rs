@@ -1,3 +1,4 @@
 mod reg;
-mod mem;
+mod addrbus;
 mod cpu;
+pub mod mem;

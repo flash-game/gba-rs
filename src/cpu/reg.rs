@@ -50,7 +50,40 @@ pub struct Register {
 
 impl Register {
     /// Get program counter
-    pub fn get_pc(&self) -> u32 { self.r15 }
+    pub fn get_pc(&self) -> u32 {
+        // TODO Add 8 byte?
+        self.r15
+    }
+
+    pub fn set_pc(&mut self, pc: u32) {
+        if (pc & 0xFFFF_FFFC) != 0x00000000 {
+            panic!(format!("Error PC value 0x{:X}", pc));
+        }
+        self.r15 = pc
+    }
+
+    pub fn get_sp(&self) -> u32 {
+        // TODO match diff CPU mode
+        return self.r13;
+    }
+
+    pub fn set_sp(&mut self, sp: u32) {
+        // TODO match diff CPU mode
+        self.r13 = sp;
+    }
+
+    ///
+    /// Get Link register
+    pub fn get_lr(&self) -> u32 {
+        // TODO match diff CPU mode
+        return self.r14;
+    }
+
+    /// Set Link register
+    pub fn set_lr(&mut self, sp: u32) {
+        // TODO match diff CPU mode
+        self.r14 = sp;
+    }
 
     pub fn new() -> Self {
         Self {
