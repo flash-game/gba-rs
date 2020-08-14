@@ -121,6 +121,28 @@ impl Register {
 
     //-----------------------------------Control---------------------------------//
 
+    pub fn ctrl_i(&self) -> bool { self.cspr & 0x0000_0080 != 0 }
+
+    pub fn ctrl_f(&self) -> bool { self.cspr & 0x0000_0040 != 0 }
+
+    pub fn ctrl_t(&self) -> bool { self.cspr & 0x0000_0020 != 0 }
+
+    /// Get the current operation status
+    pub fn op_status(&self) -> OpStatus { if self.ctrl_t() { OpStatus::Thumb } else { OpStatus::ARM } }
+
+    pub fn mode(&self) -> Mode {
+        return match self.cspr & 0x0000_001F {
+            10000 => Mode::User,
+            10001 => Mode::FastInterrupt,
+            10010 => Mode::Interrupt,
+            10011 => Mode::Supervisor,
+            10111 => Mode::Abort,
+            11011 => Mode::Undefined,
+            11111 => Mode::System,
+            n => panic!(format!("Unknow cpu mode: {:b}", n)),
+        }
+    }
+
     //-----------------------------------Control---------------------------------//
 
 
@@ -167,7 +189,24 @@ impl Register {
     }
 }
 
-pub enum OpMode {
+pub enum OpStatus {
     Thumb = 1,
     ARM = 0,
+}
+
+pub enum Mode {
+    User = 10000,
+    /// 快中断
+    FastInterrupt = 10001,
+    /// 中断
+    Interrupt = 10010,
+    /// 管理
+    Supervisor = 10011,
+    /// 中止
+    Abort = 10111,
+
+    Undefined = 11011,
+
+    System = 11111,
+
 }
