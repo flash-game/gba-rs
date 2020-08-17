@@ -52,6 +52,7 @@ impl Register {
     /// Get program counter
     pub fn get_pc(&self) -> u32 {
         // TODO Add 8 byte?
+
         self.r15
     }
 
