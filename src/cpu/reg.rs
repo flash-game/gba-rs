@@ -1,3 +1,5 @@
+use crate::main;
+
 pub struct Register {
     pub r0: u32,
     pub r1: u32,
@@ -13,6 +15,7 @@ pub struct Register {
     r11: u32,
     r12: u32,
     r13: u32,
+    /// LR
     r14: u32,
     /// PC
     r15: u32,
@@ -46,6 +49,8 @@ pub struct Register {
     spsr_und: u32,
     spsr_irq: u32,
     spsr_fiq: u32,
+
+    mode: Mode,
 }
 
 impl Register {
@@ -64,26 +69,54 @@ impl Register {
     }
 
     pub fn get_sp(&self) -> u32 {
-        // TODO match diff CPU mode
-        return self.r13;
+        return match self.mode() {
+            Mode::User => self.r13,
+            Mode::FastInterrupt => self.r13_fiq,
+            Mode::Interrupt => self.r13_irq,
+            Mode::Supervisor => self.r13_svc,
+            Mode::Abort => self.r13_abt,
+            Mode::Undefined => self.r13_und,
+            Mode::System => self.r13,
+        };
     }
 
     pub fn set_sp(&mut self, sp: u32) {
-        // TODO match diff CPU mode
-        self.r13 = sp;
+        match self.mode() {
+            Mode::User => self.r13 = sp,
+            Mode::FastInterrupt => self.r13_fiq = sp,
+            Mode::Interrupt => self.r13_irq = sp,
+            Mode::Supervisor => self.r13_svc = sp,
+            Mode::Abort => self.r13_abt = sp,
+            Mode::Undefined => self.r13_und = sp,
+            Mode::System => self.r13 = sp,
+        };
     }
 
     ///
     /// Get Link register
     pub fn get_lr(&self) -> u32 {
-        // TODO match diff CPU mode
-        return self.r14;
+        return match self.mode() {
+            Mode::User => self.r14,
+            Mode::FastInterrupt => self.r14_fiq,
+            Mode::Interrupt => self.r14_irq,
+            Mode::Supervisor => self.r14_svc,
+            Mode::Abort => self.r14_abt,
+            Mode::Undefined => self.r14_und,
+            Mode::System => self.r14,
+        };
     }
 
     /// Set Link register
-    pub fn set_lr(&mut self, sp: u32) {
-        // TODO match diff CPU mode
-        self.r14 = sp;
+    pub fn set_lr(&mut self, lr: u32) {
+        match self.mode() {
+            Mode::User => self.r14 = lr,
+            Mode::FastInterrupt => self.r14_fiq = lr,
+            Mode::Interrupt => self.r14_irq = lr,
+            Mode::Supervisor => self.r14_svc = lr,
+            Mode::Abort => self.r14_abt = lr,
+            Mode::Undefined => self.r14_und = lr,
+            Mode::System => self.r14 = lr,
+        };
     }
 
     //------------------------------------flag-----------------------------------//
@@ -131,16 +164,27 @@ impl Register {
     /// Get the current operation status
     pub fn op_status(&self) -> OpStatus { if self.ctrl_t() { OpStatus::Thumb } else { OpStatus::ARM } }
 
-    pub fn mode(&self) -> Mode {
-        return match self.cspr & 0x0000_001F {
-            10000 => Mode::User,
-            10001 => Mode::FastInterrupt,
-            10010 => Mode::Interrupt,
-            10011 => Mode::Supervisor,
-            10111 => Mode::Abort,
-            11011 => Mode::Undefined,
-            11111 => Mode::System,
-            n => panic!(format!("Unknow cpu mode: {:b}", n)),
+    pub fn mode(&self) -> &Mode { &self.mode }
+
+    pub fn set_mode(&mut self, mode: Mode) {
+        let t: u32 = match mode {
+            Mode::User => 0b10000,
+            Mode::FastInterrupt => 0b10001,
+            Mode::Interrupt => 0b10010,
+            Mode::Supervisor => 0b10011,
+            Mode::Abort => 0b10111,
+            Mode::Undefined => 0b11011,
+            Mode::System => 0b11111,
+        };
+        self.cspr = self.cspr & 0xFFFF_FFE0 | t;
+        self.mode = mode;
+        match self.op_status() {
+            OpStatus::Thumb => {
+                // TODO
+            }
+            OpStatus::ARM => {
+                // TODO
+            }
         }
     }
 
@@ -186,6 +230,7 @@ impl Register {
             spsr_und: 0,
             spsr_irq: 0,
             spsr_fiq: 0,
+            mode: Mode::User,
         }
     }
 }
