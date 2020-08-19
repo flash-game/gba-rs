@@ -6,15 +6,16 @@ xxxx_1110_xxxx_xxxx_xxxx_xxxx_xxx0_xxxx  Coprocessor Data      Operation
 xxxx_1110_xxxx_xxxx_xxxx_xxxx_xxx1_xxxx  Coprocessor Register  Transfer
 xxxx_1111_xxxx_xxxx_xxxx_xxxx_xxx1_xxxx  Software Interrupt
 //
-xxxx_0000_1xxx_xxxx_xxxx_xxxx_1001_xxxx  Multiply Long
-xxxx_000x_x0xx_xxxx_xxxx_0000_1xx1_xxxx  Halfword Data Transfer:register offset
-xxxx_0000_00xx_xxxx_xxxx_xxxx_1001_xxxx  Multiply
-xxxx_000x_x1xx_xxxx_xxxx_xxxx_1xx1_xxxx  Halfword Data Transfer:immediate offset
 xxxx_0001_0010_1111_1111_1111_0001_xxxx  Branch and Exchange
 xxxx_0001_0x00_xxxx_xxxx_0000_1001_xxxx  Single Data Swap
+xxxx_0000_00xx_xxxx_xxxx_xxxx_1001_xxxx  Multiply
+xxxx_0000_1xxx_xxxx_xxxx_xxxx_1001_xxxx  Multiply Long
+xxxx_000x_x0xx_xxxx_xxxx_0000_1xx1_xxxx  Halfword Data Transfer:register offset
+xxxx_000x_x1xx_xxxx_xxxx_xxxx_1xx1_xxxx  Halfword Data Transfer:immediate offset
 xxxx_00xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx  Data Processing / PSR Transfer
 
-xxxx_011x_xxxx_xxxx_xxxx_xxxx_xxx1_xxxx  Undefined
-xxxx_01xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx  Single Data Transfer
 
-1110_0010_1000_1111_1011_0000_0011_1100
+xxxx_01xx_xxxx_xxxx_xxxx_xxxx_xxxx_xxxx  Single Data Transfer
+xxxx_011x_xxxx_xxxx_xxxx_xxxx_xxx1_xxxx  Undefined
+
+0000_1110_0000_0000_0000_0000_0001_0000
