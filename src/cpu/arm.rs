@@ -1,5 +1,6 @@
 use crate::cpu::addrbus::AddressBus;
 use crate::cpu::reg::Register;
+use crate::util::BitUtilExt;
 
 pub struct Arm7 {
     reg: Register,
@@ -12,8 +13,26 @@ impl Arm7 {
         let op = self.address_bus.get_word(self.reg.get_pc());
         self.reg.set_pc(old_pc.wrapping_add(4));
         // cond check
-        if !self.cond_check((op >> 28) as u8) {
-            return;
+        if !self.cond_check((op >> 28) as u8) { return; }
+        let instruct_type = get_instruction_type(op);
+        match instruct_type {
+            InstructionType::BranchAndExchange => {
+                let rn = op.extract(0, 4) as u8;
+                ();
+            }
+            InstructionType::Branch => { () }
+            InstructionType::SingleDataSwap => { () }
+            InstructionType::Multiply => { () }
+            InstructionType::HalfwordDataTransfer => { () }
+            InstructionType::MultiplyLong => { () }
+            InstructionType::CoprocessorDataOperation => { () }
+            InstructionType::CoprocessorRegisterTransfer => { () }
+            InstructionType::Undefined => { () }
+            InstructionType::SoftwareInterrupt => { () }
+            InstructionType::BlockDataTransfer => { () }
+            InstructionType::CoprocessorDataTransfer => { () }
+            InstructionType::DataProcessing => { () }
+            InstructionType::SingleDataTransfer => { () }
         }
     }
 
@@ -38,28 +57,37 @@ impl Arm7 {
             /* LT */ 0xB => n != v,
             /* GT */ 0xC => !z && n == v,
             /* LE */ 0xD => z || n != v,
-            /* AL */ 0xE => true,
-            0xF => true, /* reserved, default to execute */
+            /* AL */ 0xE | 0xF => true,
             _ => unreachable!(),
         }
     }
 }
 
+fn get_instruction_type(op: u32) -> InstructionType {
+    for (select_bits, diff, instr_type) in ARM_OPCODE_TABLE.iter() {
+        if ((op & select_bits) ^ diff) == 0 {
+            return *instr_type;
+        }
+    }
+    return InstructionType::Undefined;
+}
+
+#[derive(Copy, Clone)]
 enum InstructionType {
-    BranchAndExchange,
-    SingleDataSwap,
-    Multiply,
+    /**/ BranchAndExchange,
+    /**/ SingleDataSwap,
+    /**/ Multiply,
     HalfwordDataTransfer,
-    MultiplyLong,
-    CoprocessorDataOperation,
-    CoprocessorRegisterTransfer,
-    Undefined,
-    SoftwareInterrupt,
-    BlockDataTransfer,
-    Branch,
-    CoprocessorDataTransfer,
-    DataProcessing,
-    SingleDataTransfer,
+    /**/ MultiplyLong,
+    /**/ CoprocessorDataOperation,
+    /**/ CoprocessorRegisterTransfer,
+    /**/ Undefined,
+    /**/ SoftwareInterrupt,
+    /**/ BlockDataTransfer,
+    /**/ Branch,
+    /**/ CoprocessorDataTransfer,
+    /**/ DataProcessing,
+    /**/ SingleDataTransfer,
 }
 
 ///

@@ -1,14 +1,8 @@
-use crate::main;
+
 
 pub struct Register {
-    pub r0: u32,
-    pub r1: u32,
-    pub r2: u32,
-    pub r3: u32,
-    pub r4: u32,
-    pub r5: u32,
-    pub r6: u32,
-    pub r7: u32,
+    /// Reg 0-7
+    pub_reg: [u32; 8],
     r8: u32,
     r9: u32,
     r10: u32,
@@ -56,8 +50,6 @@ pub struct Register {
 impl Register {
     /// Get program counter
     pub fn get_pc(&self) -> u32 {
-        // TODO Add 8 byte?
-
         self.r15
     }
 
@@ -70,25 +62,23 @@ impl Register {
 
     pub fn get_sp(&self) -> u32 {
         return match self.mode() {
-            Mode::User => self.r13,
+            Mode::User | Mode::System => self.r13,
             Mode::FastInterrupt => self.r13_fiq,
             Mode::Interrupt => self.r13_irq,
             Mode::Supervisor => self.r13_svc,
             Mode::Abort => self.r13_abt,
             Mode::Undefined => self.r13_und,
-            Mode::System => self.r13,
         };
     }
 
     pub fn set_sp(&mut self, sp: u32) {
         match self.mode() {
-            Mode::User => self.r13 = sp,
+            Mode::User | Mode::System => self.r13 = sp,
             Mode::FastInterrupt => self.r13_fiq = sp,
             Mode::Interrupt => self.r13_irq = sp,
             Mode::Supervisor => self.r13_svc = sp,
             Mode::Abort => self.r13_abt = sp,
             Mode::Undefined => self.r13_und = sp,
-            Mode::System => self.r13 = sp,
         };
     }
 
@@ -96,27 +86,40 @@ impl Register {
     /// Get Link register
     pub fn get_lr(&self) -> u32 {
         return match self.mode() {
-            Mode::User => self.r14,
+            Mode::User | Mode::System => self.r14,
             Mode::FastInterrupt => self.r14_fiq,
             Mode::Interrupt => self.r14_irq,
             Mode::Supervisor => self.r14_svc,
             Mode::Abort => self.r14_abt,
             Mode::Undefined => self.r14_und,
-            Mode::System => self.r14,
         };
     }
 
     /// Set Link register
     pub fn set_lr(&mut self, lr: u32) {
         match self.mode() {
-            Mode::User => self.r14 = lr,
+            Mode::User | Mode::System => self.r14 = lr,
             Mode::FastInterrupt => self.r14_fiq = lr,
             Mode::Interrupt => self.r14_irq = lr,
             Mode::Supervisor => self.r14_svc = lr,
             Mode::Abort => self.r14_abt = lr,
             Mode::Undefined => self.r14_und = lr,
-            Mode::System => self.r14 = lr,
         };
+    }
+
+    pub fn set_value(&mut self, rn: u8, val: u32) {
+        match rn {
+            0x0..=0x7 => self.pub_reg[rn as usize] = val,
+            0x8 => if self.mode == Mode::FastInterrupt { self.r9_fiq = val } else { self.r9 = val },
+            0x9 => if self.mode == Mode::FastInterrupt { self.r10_fiq = val } else { self.r10 = val },
+            0xA => if self.mode == Mode::FastInterrupt { self.r11_fiq = val } else { self.r11 = val },
+            0xB => if self.mode == Mode::FastInterrupt { self.r12_fiq = val } else { self.r12 = val },
+            0xC => if self.mode == Mode::FastInterrupt { self.r13_fiq = val } else { self.r13 = val },
+            0xD => self.set_sp(val),
+            0xE => self.set_lr(val),
+            0xF => self.set_pc(val),
+            _ => { panic!(format!("Error register value 0x{:X}", val)); }
+        }
     }
 
     //------------------------------------flag-----------------------------------//
@@ -193,14 +196,7 @@ impl Register {
 
     pub fn new() -> Self {
         Self {
-            r0: 0,
-            r1: 0,
-            r2: 0,
-            r3: 0,
-            r4: 0,
-            r5: 0,
-            r6: 0,
-            r7: 0,
+            pub_reg: [0u32; 8],
             r8: 0,
             r9: 0,
             r10: 0,
@@ -239,7 +235,7 @@ pub enum OpStatus {
     Thumb = 1,
     ARM = 0,
 }
-
+#[derive(PartialEq)]
 pub enum Mode {
     User = 10000,
     /// 快中断
