@@ -1,13 +1,11 @@
-
-
 pub struct Register {
-    /// Reg 0-7
-    pub_reg: [u32; 8],
-    r8: u32,
-    r9: u32,
-    r10: u32,
-    r11: u32,
-    r12: u32,
+    /// Register 0 - 7
+    common_reg: [u32; 8],
+    /// Register 8 - 12
+    high_common_reg: [u32; 5],
+    /// FastInterrupt Register 8 - 12
+    high_fiq_reg: [u32; 5],
+
     r13: u32,
     /// LR
     r14: u32,
@@ -26,11 +24,6 @@ pub struct Register {
     r13_irq: u32,
     r14_irq: u32,
     /// Fast Interrupt Request,FIQ 快中断模式
-    r8_fiq: u32,
-    r9_fiq: u32,
-    r10_fiq: u32,
-    r11_fiq: u32,
-    r12_fiq: u32,
     r13_fiq: u32,
     r14_fiq: u32,
 
@@ -107,18 +100,29 @@ impl Register {
         };
     }
 
-    pub fn set_value(&mut self, rn: u8, val: u32) {
+    pub fn set_reg_value(&mut self, rn: u8, val: u32) {
         match rn {
-            0x0..=0x7 => self.pub_reg[rn as usize] = val,
-            0x8 => if self.mode == Mode::FastInterrupt { self.r9_fiq = val } else { self.r9 = val },
-            0x9 => if self.mode == Mode::FastInterrupt { self.r10_fiq = val } else { self.r10 = val },
-            0xA => if self.mode == Mode::FastInterrupt { self.r11_fiq = val } else { self.r11 = val },
-            0xB => if self.mode == Mode::FastInterrupt { self.r12_fiq = val } else { self.r12 = val },
-            0xC => if self.mode == Mode::FastInterrupt { self.r13_fiq = val } else { self.r13 = val },
+            0x0..=0x7 => self.common_reg[rn as usize] = val,
+            0x8..=0xC => if self.mode == Mode::FastInterrupt {
+                self.high_fiq_reg[(rn - 8) as usize] = val
+            } else { self.high_common_reg[(rn - 8) as usize] = val }
             0xD => self.set_sp(val),
             0xE => self.set_lr(val),
             0xF => self.set_pc(val),
             _ => { panic!(format!("Error register value 0x{:X}", val)); }
+        }
+    }
+
+    pub fn get_reg_value(&mut self, rn: u8) -> u32 {
+        match rn {
+            0x0..=0x7 => self.common_reg[rn as usize],
+            0x8..=0xC => if self.mode == Mode::FastInterrupt {
+                self.high_fiq_reg[(rn - 8) as usize]
+            } else { self.high_common_reg[(rn - 8) as usize] }
+            0xD => self.get_sp(),
+            0xE => self.get_lr(),
+            0xF => self.get_pc(),
+            n => { panic!(format!("Error register number 0x{:X}", n)); }
         }
     }
 
@@ -154,9 +158,9 @@ impl Register {
     pub fn set_flag_v(&mut self, r: bool) {
         self.cspr = if r { self.cspr | 0x1000_0000 } else { self.cspr & 0xEFFF_FFFF }
     }
-    //------------------------------------flag-----------------------------------//
+//------------------------------------flag-----------------------------------//
 
-    //-----------------------------------Control---------------------------------//
+//-----------------------------------Control---------------------------------//
 
     pub fn ctrl_i(&self) -> bool { self.cspr & 0x0000_0080 != 0 }
 
@@ -191,17 +195,14 @@ impl Register {
         }
     }
 
-    //-----------------------------------Control---------------------------------//
+//-----------------------------------Control---------------------------------//
 
 
     pub fn new() -> Self {
         Self {
-            pub_reg: [0u32; 8],
-            r8: 0,
-            r9: 0,
-            r10: 0,
-            r11: 0,
-            r12: 0,
+            common_reg: [0u32; 8],
+            high_common_reg: [0u32; 5],
+            high_fiq_reg: [0u32; 5],
             r13: 0,
             r14: 0,
             r15: 0,
@@ -213,11 +214,6 @@ impl Register {
             r14_und: 0,
             r13_irq: 0,
             r14_irq: 0,
-            r8_fiq: 0,
-            r9_fiq: 0,
-            r10_fiq: 0,
-            r11_fiq: 0,
-            r12_fiq: 0,
             r13_fiq: 0,
             r14_fiq: 0,
             cspr: 0,
@@ -235,6 +231,7 @@ pub enum OpStatus {
     Thumb = 1,
     ARM = 0,
 }
+
 #[derive(PartialEq)]
 pub enum Mode {
     User = 10000,
@@ -246,9 +243,6 @@ pub enum Mode {
     Supervisor = 10011,
     /// 中止
     Abort = 10111,
-
     Undefined = 11011,
-
     System = 11111,
-
 }
