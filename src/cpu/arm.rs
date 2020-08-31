@@ -1,5 +1,5 @@
 use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::Register;
+use crate::cpu::reg::{Register, OpStatus};
 use crate::util::BitUtilExt;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -26,10 +26,19 @@ impl<'a> Arm7<'a> {
         match instruct_type {
             InstructionType::BranchAndExchange => {
                 let rn = op.extract(0, 4) as u8;
-                self.reg.get_pc();
-                ();
+                let new_pc = self.reg.get_reg_value(rn);
+                self.reg.set_pc(new_pc & !1u32);
+                // SET ARM or THUMB
+                self.reg.set_op_status(if new_pc & 0x1 == 0 { OpStatus::ARM } else { OpStatus::Thumb });
             }
-            InstructionType::Branch => { () }
+            InstructionType::Branch => {
+                let offset = op.extract(0, 24);
+                let s_offset = ((offset << 8) as i32 >> 6) as u32;
+                self.reg.set_pc(old_pc.wrapping_add(s_offset).wrapping_add(8));
+                if op & 0x0100_0000 != 0 {
+                    self.reg[reg::LR] = pc.wrapping_add(4);
+                }
+            }
             InstructionType::SingleDataSwap => { () }
             InstructionType::Multiply => { () }
             InstructionType::HalfwordDataTransfer => { () }

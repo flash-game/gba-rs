@@ -38,6 +38,7 @@ pub struct Register {
     spsr_fiq: u32,
 
     mode: Mode,
+    op_status: OpStatus,
 }
 
 impl Register {
@@ -169,7 +170,16 @@ impl Register {
     pub fn ctrl_t(&self) -> bool { self.cspr & 0x0000_0020 != 0 }
 
     /// Get the current operation status
-    pub fn op_status(&self) -> OpStatus { if self.ctrl_t() { OpStatus::Thumb } else { OpStatus::ARM } }
+    pub fn op_status(&self) -> &OpStatus { &self.op_status }
+
+    /// Set the current operation status
+    pub fn set_op_status(&mut self, status: OpStatus) {
+        match status {
+            OpStatus::Thumb => self.cspr = self.cspr | 0x0000_0020,
+            OpStatus::ARM => self.cspr = self.cspr & 0xFFFF_FFDF,
+        }
+        self.op_status = status;
+    }
 
     pub fn mode(&self) -> &Mode { &self.mode }
 
@@ -223,6 +233,7 @@ impl Register {
             spsr_irq: 0,
             spsr_fiq: 0,
             mode: Mode::User,
+            op_status: OpStatus::ARM,
         }
     }
 }
