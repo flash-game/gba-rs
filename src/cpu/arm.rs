@@ -1,8 +1,9 @@
-use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::{Register, OpStatus};
-use crate::util::BitUtilExt;
 use std::cell::RefCell;
 use std::rc::Rc;
+
+use crate::cpu::addrbus::AddressBus;
+use crate::cpu::reg::{OpStatus, Register};
+use crate::util::BitUtilExt;
 
 pub struct Arm7<'a> {
     reg: &'a mut Register,
@@ -39,10 +40,67 @@ impl<'a> Arm7<'a> {
                     self.reg[reg::LR] = pc.wrapping_add(4);
                 }
             }
-            InstructionType::SingleDataSwap => { () }
-            InstructionType::Multiply => { () }
-            InstructionType::HalfwordDataTransfer => { () }
-            InstructionType::MultiplyLong => { () }
+            InstructionType::SingleDataSwap => {
+                // TODO
+            }
+            InstructionType::Multiply => {
+                let rm = op.extract(0, 4);
+                let rs = op.extract(8, 4);
+                let rn = op.extract(12, 4);
+                let rd = op.extract(16, 4);
+                let a = (inst & 0x0020_0000) != 0;
+                let s = (inst & 0x0010_0000) != 0;
+                let result = self.reg.get_reg_value(rm as u8)
+                    .wrapping_mul(self.reg.get_reg_value(rs as u8))
+                    .wrapping_add(if a { 0 } else { self.reg.get_reg_value(rn as u8) });
+                self.reg.set_reg_value(rd as u8, result);
+                // 如果需要更改flag
+                if s {
+                    let new_z = result == 0;
+                    let new_n = (result & 0x8000_0000) != 0;
+                    self.reg.set_flag_n(new_n);
+                    self.reg.set_flag_z(new_z);
+                    self.reg.set_flag_c(false);
+                }
+            }
+            InstructionType::HalfwordDataTransfer => {
+                // TODO
+            }
+            InstructionType::MultiplyLong => {
+                let u = (op & 0x0040_0000) != 0;
+                let a = (op & 0x0020_0000) != 0;
+                let s = (op & 0x0010_0000) != 0;
+                let rdhi = op.extract(16, 4) as u8;
+                let rdlo = op.extract(12, 4) as u8;
+                let rs = op.extract(8, 4);
+                let rm = op.extract(0, 4);
+                let result: u64 = if !u {
+                    let vs = self.reg.get_reg_value(rs as u8);
+                    let vm = self.reg.get_reg_value(rm as u8);
+                    let prod = (vs as u64) * (vm as u64);
+                    prod.wrapping_add(if !a { 0u64 } else {
+                        combine64(self.reg[rdhi], self.reg[rdlo])
+                    })
+                } else {
+                    let vs = self.reg.get_reg_value(rs as u8) as i32;
+                    let vm = self.reg.get_reg_value(rm as u8) as i32;
+                    let prod = (vs as i64) * (vm as i64);
+                    prod.wrapping_add(if !a { 0i64 } else {
+                        combine64(self.reg[rdhi], self.reg[rdlo]) as i64
+                    }) as u64
+                };
+
+                let (reshi, reslo) = split64(res);
+                self.reg.set_reg_value(rdhi, reshi);
+                self.reg.set_reg_value(rdlo, reslo);
+                if s {
+                    let new_n = (reshi & 0x8000_0000) != 0;
+                    self.reg.set_flag_n(new_n);
+                    self.reg.set_flag_z(result == 0);
+                    self.reg.set_flag_c(false);
+                    self.reg.set_flag_v(false);
+                }
+            }
             InstructionType::CoprocessorDataOperation => { () }
             InstructionType::CoprocessorRegisterTransfer => { () }
             InstructionType::Undefined => { () }

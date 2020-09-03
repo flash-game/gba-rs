@@ -3,7 +3,7 @@ pub trait BitUtilExt {
 }
 
 impl BitUtilExt for u32 {
-    /// 保留指定长度的位，其他位置0
+    /// 获取指定长度的位，其他位置0
     fn extract(self, off: u8, len: u8) -> u32 {
         (self >> off) & ((1u32 << len) - 1)
     }

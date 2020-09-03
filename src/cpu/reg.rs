@@ -48,7 +48,7 @@ impl Register {
     }
 
     pub fn set_pc(&mut self, pc: u32) {
-        if (pc & 0xFFFF_FFFC) != 0x00000000 {
+        if (pc & 0xFFFF_FFFC) != 0x0000_0000 {
             panic!(format!("Error PC value 0x{:X}", pc));
         }
         self.r15 = pc
