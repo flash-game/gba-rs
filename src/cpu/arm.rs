@@ -2,8 +2,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::{OpStatus, Register};
-use crate::util::BitUtilExt;
+use crate::cpu::reg::{OpType, Register};
+use crate::util::{BitUtilExt, combine64, split64};
 
 pub struct Arm7<'a> {
     reg: &'a mut Register,
@@ -27,40 +27,51 @@ impl<'a> Arm7<'a> {
         match instruct_type {
             InstructionType::BranchAndExchange => {
                 let rn = op.extract(0, 4) as u8;
-                let new_pc = self.reg.get_reg_value(rn);
+                let new_pc = self.reg.reg_val(rn);
                 self.reg.set_pc(new_pc & !1u32);
                 // SET ARM or THUMB
-                self.reg.set_op_status(if new_pc & 0x1 == 0 { OpStatus::ARM } else { OpStatus::Thumb });
+                self.reg.set_op_type(if new_pc & 0x1 == 0 { OpType::ARM } else { OpType::Thumb });
             }
             InstructionType::Branch => {
                 let offset = op.extract(0, 24);
                 let s_offset = ((offset << 8) as i32 >> 6) as u32;
                 self.reg.set_pc(old_pc.wrapping_add(s_offset).wrapping_add(8));
                 if op & 0x0100_0000 != 0 {
-                    self.reg[reg::LR] = pc.wrapping_add(4);
+                    self.reg.set_lr(old_pc.wrapping_add(4));
                 }
             }
             InstructionType::SingleDataSwap => {
-                // TODO
+                let rm = op.extract(0, 4) as u8;
+                let rd = op.extract(12, 4) as u8;
+                let rn = op.extract(16, 4) as u8;
+                let b = op.get_bit_bool(22);
+                // If it is not a byte operation then force word align
+                let addr = self.reg.reg_val(rn) & !((1 - if b { 1 } else { 2 }) * 3);
+                let addr_mut = self.address_bus.borrow_mut();
+                let addr_val = if b { addr_mut.get_byte(addr) as u32 } else { addr_mut.get_word(addr) };
+                let reg_val = self.reg.reg_val(rm);
+                if b {
+                    addr_mut.set_byte(addr, reg_val as u8)
+                } else {
+                    addr_mut.set_word(addr, reg_val)
+                }
+                self.reg.set_reg(rd, addr_val);
             }
             InstructionType::Multiply => {
                 let rm = op.extract(0, 4);
                 let rs = op.extract(8, 4);
                 let rn = op.extract(12, 4);
                 let rd = op.extract(16, 4);
-                let a = (inst & 0x0020_0000) != 0;
-                let s = (inst & 0x0010_0000) != 0;
-                let result = self.reg.get_reg_value(rm as u8)
-                    .wrapping_mul(self.reg.get_reg_value(rs as u8))
-                    .wrapping_add(if a { 0 } else { self.reg.get_reg_value(rn as u8) });
-                self.reg.set_reg_value(rd as u8, result);
+                let a = (op & 0x0020_0000) != 0;
+                let s = (op & 0x0010_0000) != 0;
+                let result = self.reg.reg_val(rm as u8)
+                    .wrapping_mul(self.reg.reg_val(rs as u8))
+                    .wrapping_add(if a { 0 } else { self.reg.reg_val(rn as u8) });
+                self.reg.set_reg(rd as u8, result);
                 // 如果需要更改flag
                 if s {
-                    let new_z = result == 0;
                     let new_n = (result & 0x8000_0000) != 0;
-                    self.reg.set_flag_n(new_n);
-                    self.reg.set_flag_z(new_z);
-                    self.reg.set_flag_c(false);
+                    self.reg.set_flag_nzcv(new_n, result == 0, false, self.reg.flag_v());
                 }
             }
             InstructionType::HalfwordDataTransfer => {
@@ -74,41 +85,37 @@ impl<'a> Arm7<'a> {
                 let rdlo = op.extract(12, 4) as u8;
                 let rs = op.extract(8, 4);
                 let rm = op.extract(0, 4);
+                let vs_u = self.reg.reg_val(rs as u8);
+                let vm_u = self.reg.reg_val(rm as u8);
                 let result: u64 = if !u {
-                    let vs = self.reg.get_reg_value(rs as u8);
-                    let vm = self.reg.get_reg_value(rm as u8);
-                    let prod = (vs as u64) * (vm as u64);
+                    let prod = (vs_u as u64) * (vm_u as u64);
                     prod.wrapping_add(if !a { 0u64 } else {
-                        combine64(self.reg[rdhi], self.reg[rdlo])
+                        combine64(self.reg.reg_val(rdhi), self.reg.reg_val(rdlo))
                     })
                 } else {
-                    let vs = self.reg.get_reg_value(rs as u8) as i32;
-                    let vm = self.reg.get_reg_value(rm as u8) as i32;
-                    let prod = (vs as i64) * (vm as i64);
+                    let prod = (vs_u as i64) * (vm_u as i64);
                     prod.wrapping_add(if !a { 0i64 } else {
-                        combine64(self.reg[rdhi], self.reg[rdlo]) as i64
+                        combine64(self.reg.reg_val(rdhi), self.reg.reg_val(rdlo)) as i64
                     }) as u64
                 };
-
-                let (reshi, reslo) = split64(res);
-                self.reg.set_reg_value(rdhi, reshi);
-                self.reg.set_reg_value(rdlo, reslo);
+                let (reshi, reslo) = split64(result);
+                self.reg.set_reg(rdhi, reshi);
+                self.reg.set_reg(rdlo, reslo);
                 if s {
                     let new_n = (reshi & 0x8000_0000) != 0;
-                    self.reg.set_flag_n(new_n);
-                    self.reg.set_flag_z(result == 0);
-                    self.reg.set_flag_c(false);
-                    self.reg.set_flag_v(false);
+                    self.reg.set_flag_nzcv(new_n, result == 0, false, false);
                 }
             }
             InstructionType::CoprocessorDataOperation => { () }
             InstructionType::CoprocessorRegisterTransfer => { () }
             InstructionType::Undefined => { () }
             InstructionType::SoftwareInterrupt => { () }
-            InstructionType::BlockDataTransfer => { () }
+            InstructionType::BlockDataTransfer => {
+                // TODO
+            }
             InstructionType::CoprocessorDataTransfer => { () }
             InstructionType::DataProcessing => { () }
-            InstructionType::SingleDataTransfer => { () }
+            InstructionType::SingleDataTransfer => {}
         }
     }
 

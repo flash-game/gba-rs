@@ -38,7 +38,7 @@ pub struct Register {
     spsr_fiq: u32,
 
     mode: Mode,
-    op_status: OpStatus,
+    op_status: OpType,
 }
 
 impl Register {
@@ -101,7 +101,8 @@ impl Register {
         };
     }
 
-    pub fn set_reg_value(&mut self, rn: u8, val: u32) {
+    /// Set Register value with rn number
+    pub fn set_reg(&mut self, rn: u8, val: u32) {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize] = val,
             0x8..=0xC => if self.mode == Mode::FastInterrupt {
@@ -114,7 +115,8 @@ impl Register {
         }
     }
 
-    pub fn get_reg_value(&mut self, rn: u8) -> u32 {
+    /// Get a Register value with rn number
+    pub fn reg_val(&mut self, rn: u8) -> u32 {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize],
             0x8..=0xC => if self.mode == Mode::FastInterrupt {
@@ -159,6 +161,14 @@ impl Register {
     pub fn set_flag_v(&mut self, r: bool) {
         self.cspr = if r { self.cspr | 0x1000_0000 } else { self.cspr & 0xEFFF_FFFF }
     }
+
+    /// Set CSPR Flag value , include flag_n/flag_z/flag_c/flag_v
+    pub fn set_flag_nzcv(&mut self, n: bool, z: bool, c: bool, v: bool) {
+        self.set_flag_n(n);
+        self.set_flag_z(z);
+        self.set_flag_c(c);
+        self.set_flag_v(v);
+    }
 //------------------------------------flag-----------------------------------//
 
 //-----------------------------------Control---------------------------------//
@@ -170,13 +180,13 @@ impl Register {
     pub fn ctrl_t(&self) -> bool { self.cspr & 0x0000_0020 != 0 }
 
     /// Get the current operation status
-    pub fn op_status(&self) -> &OpStatus { &self.op_status }
+    pub fn op_status(&self) -> &OpType { &self.op_status }
 
     /// Set the current operation status
-    pub fn set_op_status(&mut self, status: OpStatus) {
+    pub fn set_op_type(&mut self, status: OpType) {
         match status {
-            OpStatus::Thumb => self.cspr = self.cspr | 0x0000_0020,
-            OpStatus::ARM => self.cspr = self.cspr & 0xFFFF_FFDF,
+            OpType::Thumb => self.cspr = self.cspr | 0x0000_0020,
+            OpType::ARM => self.cspr = self.cspr & 0xFFFF_FFDF,
         }
         self.op_status = status;
     }
@@ -196,10 +206,10 @@ impl Register {
         self.cspr = self.cspr & 0xFFFF_FFE0 | t;
         self.mode = mode;
         match self.op_status() {
-            OpStatus::Thumb => {
+            OpType::Thumb => {
                 // TODO
             }
-            OpStatus::ARM => {
+            OpType::ARM => {
                 // TODO
             }
         }
@@ -233,12 +243,12 @@ impl Register {
             spsr_irq: 0,
             spsr_fiq: 0,
             mode: Mode::User,
-            op_status: OpStatus::ARM,
+            op_status: OpType::ARM,
         }
     }
 }
 
-pub enum OpStatus {
+pub enum OpType {
     Thumb = 1,
     ARM = 0,
 }
