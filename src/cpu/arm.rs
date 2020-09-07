@@ -111,11 +111,33 @@ impl<'a> Arm7<'a> {
             InstructionType::Undefined => { () }
             InstructionType::SoftwareInterrupt => { () }
             InstructionType::BlockDataTransfer => {
-                // TODO
+                let p = op.get_bit_bool(24);
+                let u = op.get_bit_bool(23);
+                let s = op.get_bit_bool(22);
+                let w = op.get_bit_bool(21);
+                let l = op.get_bit_bool(20);
+                let rn = op.extract(16, 4) as u8;
+                let reglist = op.extract(0, 16) as u16;
+                let base_addr = self.reg.reg_val(rn);
+                let addr_mode = (op.extract(20, 5) & 0b1_1001) as u8;
+                let a = |x: u32| {
+                    return 1;
+                };
+                match addr_mode {
+                    0b1_1001 => { a(1) }
+                    0b0_1001 => {}
+                    0b1_0001 => {}
+                    0b0_0001 => {}
+                    0b1_1000 => {}
+                    0b0_1000 => {}
+                    0b1_0000 => {}
+                    0b0_0000 => {}
+                    _ => {}
+                }
             }
             InstructionType::CoprocessorDataTransfer => { () }
             InstructionType::DataProcessing => { () }
-            InstructionType::SingleDataTransfer => {}
+            InstructionType::SingleDataTransfer => { () }
         }
     }
 
