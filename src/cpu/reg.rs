@@ -171,6 +171,7 @@ impl Register {
     }
 //------------------------------------flag-----------------------------------//
 
+
 //-----------------------------------Control---------------------------------//
 
     pub fn ctrl_i(&self) -> bool { self.cspr & 0x0000_0080 != 0 }
@@ -215,6 +216,17 @@ impl Register {
         }
     }
 
+    pub fn set_spsr(&mut self, spsr_val: u32) {
+        match self.mode() {
+            Mode::FastInterrupt => self.spsr_fiq = spsr_val,
+            Mode::Interrupt => self.spsr_irq = spsr_val,
+            Mode::Supervisor => self.spsr_svc = spsr_val,
+            Mode::Abort => self.spsr_abt = spsr_val,
+            Mode::Undefined => self.spsr_und = spsr_val,
+            n => println!(format!("Unsupport spsr mode {:?}", n)),
+        };
+    }
+
 //-----------------------------------Control---------------------------------//
 
 
@@ -246,6 +258,7 @@ impl Register {
             op_status: OpType::ARM,
         }
     }
+    pub fn cspr(&self) -> u32 { self.cspr }
 }
 
 pub enum OpType {
@@ -253,7 +266,7 @@ pub enum OpType {
     ARM = 0,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub enum Mode {
     User = 10000,
     /// 快中断

@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::{OpType, Register};
+use crate::cpu::reg::{OpType, Register, Mode};
 use crate::util::{BitUtilExt, combine64, split64};
 
 pub struct Arm7<'a> {
@@ -109,7 +109,18 @@ impl<'a> Arm7<'a> {
             InstructionType::CoprocessorDataOperation => { () }
             InstructionType::CoprocessorRegisterTransfer => { () }
             InstructionType::Undefined => { () }
-            InstructionType::SoftwareInterrupt => { () }
+            InstructionType::SoftwareInterrupt => {
+                let old_cpsr = self.reg.cspr();
+                let current_pc = old_pc;
+                self.reg.set_op_type(OpType::ARM);
+                self.reg.set_mode(Mode::Supervisor);
+                // TODO ????
+                // cpu.cpsr.control_bits.irq_disable = true;
+                self.reg.set_spsr(old_cpsr);
+                self.set_register(ARM_LR, current_pc);
+                self.reg.set_lr(current_pc); // set LR to the next instruction
+                self.reg.set_pc(0x08);
+            }
             InstructionType::BlockDataTransfer => {
                 let p = op.get_bit_bool(24);
                 let u = op.get_bit_bool(23);
@@ -124,7 +135,7 @@ impl<'a> Arm7<'a> {
                     return 1;
                 };
                 match addr_mode {
-                    0b1_1001 => { a(1) }
+                    0b1_1001 => { a(1); }
                     0b0_1001 => {}
                     0b1_0001 => {}
                     0b0_0001 => {}
@@ -134,10 +145,13 @@ impl<'a> Arm7<'a> {
                     0b0_0000 => {}
                     _ => {}
                 }
+                //  TODO
             }
             InstructionType::CoprocessorDataTransfer => { () }
             InstructionType::DataProcessing => { () }
-            InstructionType::SingleDataTransfer => { () }
+            InstructionType::SingleDataTransfer => {
+                let rm = op.extract(16, 4) as u8;
+            }
         }
     }
 
