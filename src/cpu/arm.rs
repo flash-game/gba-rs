@@ -106,7 +106,7 @@ impl<'a> Arm7<'a> {
                     self.reg.set_flag_nzcv(new_n, result == 0, false, false);
                 }
             }
-            InstructionType::CoprocessorDataOperation => { () }
+            InstructionType::CoprocessorDataOperation => {}
             InstructionType::CoprocessorRegisterTransfer => { () }
             InstructionType::Undefined => { () }
             InstructionType::SoftwareInterrupt => {
@@ -114,8 +114,8 @@ impl<'a> Arm7<'a> {
                 let current_pc = old_pc;
                 self.reg.set_op_type(OpType::ARM);
                 self.reg.set_mode(Mode::Supervisor);
-                // TODO ????
-                // cpu.cpsr.control_bits.irq_disable = true;
+                // set irq_disable true
+                self.reg.set_irq_disable(true);
                 self.reg.set_spsr(old_cpsr);
                 self.set_register(ARM_LR, current_pc);
                 self.reg.set_lr(current_pc); // set LR to the next instruction
@@ -148,7 +148,11 @@ impl<'a> Arm7<'a> {
                 //  TODO
             }
             InstructionType::CoprocessorDataTransfer => { () }
-            InstructionType::DataProcessing => { () }
+            InstructionType::DataProcessing => {
+                // TODO
+                let i = op.get_bit_bool(25);
+
+            }
             InstructionType::SingleDataTransfer => {
                 let rm = op.extract(16, 4) as u8;
             }

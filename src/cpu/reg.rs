@@ -102,6 +102,7 @@ impl Register {
     }
 
     /// Set Register value with rn number
+    /// Such as : rn=0 val=0xFFFF , r0=0xFFFF.
     pub fn set_reg(&mut self, rn: u8, val: u32) {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize] = val,
@@ -174,11 +175,20 @@ impl Register {
 
 //-----------------------------------Control---------------------------------//
 
-    pub fn ctrl_i(&self) -> bool { self.cspr & 0x0000_0080 != 0 }
+    pub fn irq_disable(&self) -> bool { self.cspr & 0x0000_0080 != 0 }
 
-    pub fn ctrl_f(&self) -> bool { self.cspr & 0x0000_0040 != 0 }
+    pub fn set_irq_disable(&mut self, disable: bool) {
+        self.cspr = if disable { self.cspr | 0x80 } else { self.cspr & 0xFFFFFF7F }
+    }
 
-    pub fn ctrl_t(&self) -> bool { self.cspr & 0x0000_0020 != 0 }
+    pub fn fiq_disable(&self) -> bool { self.cspr & 0x0000_0040 != 0 }
+
+    pub fn set_fiq_disable(&mut self, disable: bool) {
+        self.cspr = if disable { self.cspr | 0x40 } else { self.cspr & 0xFFFFFFBF }
+    }
+
+    // Use set_op_type
+    // pub fn ctrl_t(&self) -> bool { self.cspr & 0x0000_0020 != 0 }
 
     /// Get the current operation status
     pub fn op_status(&self) -> &OpType { &self.op_status }
