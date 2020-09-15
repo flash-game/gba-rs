@@ -2,7 +2,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::{OpType, Register, Mode};
+use crate::cpu::reg::{Mode, OpType, Register};
 use crate::util::{BitUtilExt, combine64, split64};
 
 pub struct Arm7<'a> {
@@ -30,7 +30,7 @@ impl<'a> Arm7<'a> {
                 let new_pc = self.reg.reg_val(rn);
                 self.reg.set_pc(new_pc & !1u32);
                 // SET ARM or THUMB
-                self.reg.set_op_type(if new_pc & 0x1 == 0 { OpType::ARM } else { OpType::Thumb });
+                self.reg.cspr.set_op_type(if new_pc & 0x1 == 0 { OpType::ARM } else { OpType::Thumb });
             }
             InstructionType::Branch => {
                 let offset = op.extract(0, 24);
@@ -71,7 +71,7 @@ impl<'a> Arm7<'a> {
                 // 如果需要更改flag
                 if s {
                     let new_n = (result & 0x8000_0000) != 0;
-                    self.reg.set_flag_nzcv(new_n, result == 0, false, self.reg.flag_v());
+                    self.reg.cspr.set_flag_nzcv(new_n, result == 0, false, self.reg.cspr.flag_v());
                 }
             }
             InstructionType::HalfwordDataTransfer => {
@@ -103,21 +103,21 @@ impl<'a> Arm7<'a> {
                 self.reg.set_reg(rdlo, reslo);
                 if s {
                     let new_n = (reshi & 0x8000_0000) != 0;
-                    self.reg.set_flag_nzcv(new_n, result == 0, false, false);
+                    self.reg.cspr.set_flag_nzcv(new_n, result == 0, false, false);
                 }
             }
             InstructionType::CoprocessorDataOperation => {}
             InstructionType::CoprocessorRegisterTransfer => { () }
             InstructionType::Undefined => { () }
             InstructionType::SoftwareInterrupt => {
-                let old_cpsr = self.reg.cspr();
+                let old_cpsr = self.reg.cspr.value();
                 let current_pc = old_pc;
-                self.reg.set_op_type(OpType::ARM);
-                self.reg.set_mode(Mode::Supervisor);
+                self.reg.cspr.set_op_type(OpType::ARM);
+                self.reg.cspr.set_mode(Mode::Supervisor);
                 // set irq_disable true
-                self.reg.set_irq_disable(true);
+                self.reg.cspr.set_irq_disable(true);
                 self.reg.set_spsr(old_cpsr);
-                self.set_register(ARM_LR, current_pc);
+                self.reg.set_lr(current_pc);
                 self.reg.set_lr(current_pc); // set LR to the next instruction
                 self.reg.set_pc(0x08);
             }
@@ -149,9 +149,42 @@ impl<'a> Arm7<'a> {
             }
             InstructionType::CoprocessorDataTransfer => { () }
             InstructionType::DataProcessing => {
-                // TODO
                 let i = op.get_bit_bool(25);
-
+                let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
+                let s = op.get_bit_bool(20);
+                let rn = op.extract(16, 4) as u8;
+                let rd = op.extract(12, 4) as u8;
+                let operand2 = op.extract(0, 12);
+                let operand1 = self.reg.reg_val(rn);
+                let result: u32 = match opcode_type {
+                    OpcodeType::AND => { 1 }
+                    OpcodeType::EOR => { 1 }
+                    OpcodeType::SUB => { 1 }
+                    OpcodeType::RSB => { 1 }
+                    OpcodeType::ADD => { 1 }
+                    OpcodeType::ADC => { 1 }
+                    OpcodeType::SBC => { 1 }
+                    OpcodeType::RSC => { 1 }
+                    OpcodeType::TST => { 1 }
+                    OpcodeType::TEQ => { 1 }
+                    OpcodeType::CMP => { 1 }
+                    OpcodeType::CMN => { 1 }
+                    OpcodeType::ORR => { 1 }
+                    OpcodeType::MOV => { 1 }
+                    OpcodeType::BIC => { 1 }
+                    OpcodeType::MVN => { 1 }
+                };
+                if s { // If S bit is '1' , set condition codes
+                    if rd != 15 {
+                        let new_n = (result as i32) < 0;
+                        // TODO flag_c,flag_v
+                        self.reg.cspr.set_flag_nzcv(new_n, result == 0, true, true);
+                    } else {
+                        // self.reg.cspr(self.reg.spsr());
+                        // self.reg[reg::CPSR] = self.reg[reg::SPSR];
+                        // self.reg.update_bank();
+                    }
+                }
             }
             InstructionType::SingleDataTransfer => {
                 let rm = op.extract(16, 4) as u8;
@@ -161,10 +194,10 @@ impl<'a> Arm7<'a> {
 
 
     fn cond_check(&self, cond: u8) -> bool {
-        let z = self.reg.flag_z();
-        let c = self.reg.flag_c();
-        let v = self.reg.flag_v();
-        let n = self.reg.flag_n();
+        let z = self.reg.cspr.flag_z();
+        let c = self.reg.cspr.flag_c();
+        let v = self.reg.cspr.flag_v();
+        let n = self.reg.cspr.flag_n();
         match cond {
             /* EQ */ 0x0 => z,
             /* NE */ 0x1 => !z,
@@ -231,3 +264,46 @@ const ARM_OPCODE_TABLE: [(u32, u32, InstructionType); 15] = [
     (0x0c000000, 0x00000000, InstructionType::DataProcessing),
     (0x0c000000, 0x04000000, InstructionType::SingleDataTransfer),
 ];
+
+enum OpcodeType {
+    AND,
+    EOR,
+    SUB,
+    RSB,
+    ADD,
+    ADC,
+    SBC,
+    RSC,
+    TST,
+    TEQ,
+    CMP,
+    CMN,
+    ORR,
+    MOV,
+    BIC,
+    MVN,
+}
+
+impl From<u8> for OpcodeType {
+    fn from(opcode: u8) -> Self {
+        match opcode {
+            0b0000 => OpcodeType::AND,
+            0b0001 => OpcodeType::EOR,
+            0b0010 => OpcodeType::SUB,
+            0b0011 => OpcodeType::RSB,
+            0b0100 => OpcodeType::ADD,
+            0b0101 => OpcodeType::ADC,
+            0b0110 => OpcodeType::SBC,
+            0b0111 => OpcodeType::RSC,
+            0b1000 => OpcodeType::TST,
+            0b1001 => OpcodeType::TEQ,
+            0b1010 => OpcodeType::CMP,
+            0b1011 => OpcodeType::CMN,
+            0b1100 => OpcodeType::ORR,
+            0b1101 => OpcodeType::MOV,
+            0b1110 => OpcodeType::BIC,
+            0b1111 => OpcodeType::MVN,
+            n => panic!(format!("Unknow opcode 0x{:X}", n))
+        }
+    }
+}
