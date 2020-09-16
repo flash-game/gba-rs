@@ -156,38 +156,82 @@ impl<'a> Arm7<'a> {
                 let rd = op.extract(12, 4) as u8;
                 let operand2 = op.extract(0, 12);
                 let operand1 = self.reg.reg_val(rn);
-                let result: u32 = match opcode_type {
-                    OpcodeType::AND => { 1 }
-                    OpcodeType::EOR => { 1 }
-                    OpcodeType::SUB => { 1 }
-                    OpcodeType::RSB => { 1 }
-                    OpcodeType::ADD => { 1 }
-                    OpcodeType::ADC => { 1 }
-                    OpcodeType::SBC => { 1 }
-                    OpcodeType::RSC => { 1 }
-                    OpcodeType::TST => { 1 }
-                    OpcodeType::TEQ => { 1 }
-                    OpcodeType::CMP => { 1 }
-                    OpcodeType::CMN => { 1 }
-                    OpcodeType::ORR => { 1 }
-                    OpcodeType::MOV => { 1 }
-                    OpcodeType::BIC => { 1 }
-                    OpcodeType::MVN => { 1 }
+                // resutls ( 0:result value   1:flag_C   2:flag_V )
+                let results: (u32, bool, bool) = match opcode_type {
+                    OpcodeType::AND => {
+                        (1, true, true)
+                    }
+                    OpcodeType::EOR => {
+                        (1, true, true)
+                    }
+                    OpcodeType::SUB => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::RSB => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::ADD => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::ADC => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::SBC => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::RSC => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::TST => {
+                        (1, true, true)
+                    }
+                    OpcodeType::TEQ => {
+                        (1, true, true)
+                    }
+                    OpcodeType::CMP => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::CMN => {
+                        // logic
+                        (1, true, true)
+                    }
+                    OpcodeType::ORR => {
+                        (1, true, true)
+                    }
+                    OpcodeType::MOV => {
+                        (1, true, true)
+                    }
+                    OpcodeType::BIC => {
+                        (1, true, true)
+                    }
+                    OpcodeType::MVN => {
+                        (1, true, true)
+                    }
                 };
                 if s { // If S bit is '1' , set condition codes
                     if rd != 15 {
-                        let new_n = (result as i32) < 0;
+                        let new_n = (results.0 as i32) < 0;
                         // TODO flag_c,flag_v
-                        self.reg.cspr.set_flag_nzcv(new_n, result == 0, true, true);
+                        self.reg.cspr.set_flag_nzcv(new_n, results.0 == 0, results.1, results.2);
                     } else {
-                        // self.reg.cspr(self.reg.spsr());
+                        self.reg.cspr.set_val(self.reg.spsr())
                         // self.reg[reg::CPSR] = self.reg[reg::SPSR];
                         // self.reg.update_bank();
                     }
+                } else if !s && rd == 15 {
+                    self.reg.set_reg(rd, results.0)
                 }
             }
             InstructionType::SingleDataTransfer => {
                 let rm = op.extract(16, 4) as u8;
+                // TODO
             }
         }
     }
