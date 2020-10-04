@@ -1,9 +1,11 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use fantasy_util::bit::usize::BitUtil;
+
 use crate::cpu::addrbus::AddressBus;
 use crate::cpu::reg::{Mode, OpType, Register};
-use crate::util::{BitUtilExt, combine64, split64};
+use crate::util::{combine64, split64};
 
 pub struct Arm7<'a> {
     reg: &'a mut Register,

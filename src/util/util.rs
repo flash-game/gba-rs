@@ -1,19 +1,19 @@
-pub trait BitUtilExt {
-    fn extract(self, off: u8, len: u8) -> u32;
-
-    fn get_bit_bool(self, bit: u8) -> bool;
-}
-
-impl BitUtilExt for u32 {
-    /// 获取指定长度的位，其他位置0
-    fn extract(self, off: u8, len: u8) -> u32 {
-        (self >> off) & ((1u32 << len) - 1)
-    }
-
-    fn get_bit_bool(self, bit: u8) -> bool {
-        ((self >> bit) & 0x0000_0001) != 0
-    }
-}
+// pub trait BitUtilExt {
+//     fn extract(self, off: u8, len: u8) -> u32;
+//
+//     fn get_bit_bool(self, bit: u8) -> bool;
+// }
+//
+// impl BitUtilExt for u32 {
+//     /// 获取指定长度的位，其他位置0
+//     fn extract(self, off: u8, len: u8) -> u32 {
+//         (self >> off) & ((1u32 << len) - 1)
+//     }
+//
+//     fn get_bit_bool(self, bit: u8) -> bool {
+//         ((self >> bit) & 0x0000_0001) != 0
+//     }
+// }
 
 /// Combines two 32 bit words into a 64 bit word
 #[inline]

@@ -1,5 +1,5 @@
-use crate::util::BitUtilExt;
 use std::sync::{Arc, Mutex};
+use fantasy_util::bit::usize::BitUtil;
 
 mod cpu;
 mod util;
