@@ -276,19 +276,27 @@ fn get_instruction_type(op: u32) -> InstructionType {
 
 #[derive(Copy, Clone)]
 enum InstructionType {
+    // BX
     BranchAndExchange,
+    // SWP
     SingleDataSwap,
     Multiply,
+    // HDRF
     HalfwordDataTransfer,
     MultiplyLong,
     CoprocessorDataOperation,
     CoprocessorRegisterTransfer,
     Undefined,
+    // SWI
     SoftwareInterrupt,
+    // LDM
     BlockDataTransfer,
+    // B
     Branch,
+    // CDP
     CoprocessorDataTransfer,
     DataProcessing,
+    // LDR
     SingleDataTransfer,
 }
 
