@@ -2,11 +2,12 @@ use std::sync::{Arc, Mutex};
 
 use crate::cpu::arm_op::instruct_execute::InstructExecute;
 use crate::cpu::reg::Register;
+use fantasy_util::bit::usize::BitUtil;
 
 struct DataProcess {}
 
 impl InstructExecute for DataProcess {
-    fn execute(reg: &mut Register) {
+    fn execute(op: u32, reg: &mut Register) {
         let i = op.get_bit_bool(25);
         let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
         let s = op.get_bit_bool(20);
@@ -15,69 +16,34 @@ impl InstructExecute for DataProcess {
         let operand2 = op.extract(0, 12);
         if i {
             // 立即数
+            let imm = op.extract(0, 8) as u8;
+            // 立即数
         } else {
+            let rm = op.extract(0, 4) as u8;
 
             // 寄存器移位
         }
         let operand1 = reg.reg_val(rn);
         // resutls ( 0:result value   1:flag_C   2:flag_V )
         let results: (u32, bool, bool) = match opcode_type {
-            OpcodeType::AND => {
-                (1, true, true)
-            }
-            OpcodeType::EOR => {
-                (1, true, true)
-            }
-            OpcodeType::SUB => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::RSB => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::ADD => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::ADC => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::SBC => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::RSC => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::TST => {
-                (1, true, true)
-            }
-            OpcodeType::TEQ => {
-                (1, true, true)
-            }
-            OpcodeType::CMP => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::CMN => {
-                // logic
-                (1, true, true)
-            }
-            OpcodeType::ORR => {
-                (1, true, true)
-            }
-            OpcodeType::MOV => {
-                (1, true, true)
-            }
-            OpcodeType::BIC => {
-                (1, true, true)
-            }
-            OpcodeType::MVN => {
-                (1, true, true)
-            }
+            OpcodeType::AND => {}
+            OpcodeType::EOR => {}
+            OpcodeType::SUB => {}
+            OpcodeType::RSB => {}
+            OpcodeType::ADD => {}
+            OpcodeType::ADC => {}
+            OpcodeType::SBC => {}
+            OpcodeType::RSC => {}
+
+            OpcodeType::TST => {}
+            OpcodeType::TEQ => {}
+            OpcodeType::CMP => {}
+            OpcodeType::CMN => {}
+
+            OpcodeType::ORR => {}
+            OpcodeType::MOV => {}
+            OpcodeType::BIC => {}
+            OpcodeType::MVN => {}
         };
         if s { // If S bit is '1' , set condition codes
             if rd != 15 {

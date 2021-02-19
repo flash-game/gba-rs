@@ -3,5 +3,5 @@ use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 
 pub trait InstructExecute {
-    fn execute(reg: &mut Register);
+    fn execute(op: u32, reg: &mut Register);
 }
