@@ -150,9 +150,7 @@ impl<'a> Arm7<'a> {
                 //  TODO
             }
             InstructionType::CoprocessorDataTransfer => { () }
-            InstructionType::DataProcessing => {
-
-            }
+            InstructionType::DataProcessing => {}
             InstructionType::SingleDataTransfer => {
                 let rm = op.extract(16, 4) as u8;
                 // TODO
@@ -214,10 +212,11 @@ enum InstructionType {
     SoftwareInterrupt,
     // LDM
     BlockDataTransfer,
-    // B
+    // B,BL
     Branch,
     // CDP
     CoprocessorDataTransfer,
+    // ADC,ADD,AND,BIC,CMN,CMP,EOR,MOV,MVN,ORR,RSB,RSC,SBC,SUB,TEQ,TST
     DataProcessing,
     // LDR
     SingleDataTransfer,

@@ -1,8 +1,9 @@
 use std::sync::{Arc, Mutex};
 
+use fantasy_util::bit::usize::BitUtil;
+
 use crate::cpu::arm_op::instruct_execute::InstructExecute;
 use crate::cpu::reg::Register;
-use fantasy_util::bit::usize::BitUtil;
 
 struct DataProcess {}
 
@@ -20,7 +21,14 @@ impl InstructExecute for DataProcess {
             // 立即数
         } else {
             let rm = op.extract(0, 4) as u8;
-
+            let rm_val = reg.reg_val(rm);
+            let bit5 = op.get_bit_bool(4);
+            let shift_amount = if bit5 {
+                let rs = op.extract(8, 4) as u8;
+                reg.reg_val(rs) as u8 & 0b00011111
+            } else {
+                op.extract(7, 5) as u8
+            };
             // 寄存器移位
         }
         let operand1 = reg.reg_val(rn);
@@ -102,4 +110,11 @@ impl From<u8> for OpcodeType {
             n => panic!(format!("Unknow opcode 0x{:X}", n))
         }
     }
+}
+
+enum ShiftType {
+    LogicalLeft,
+    LogicalRight,
+    ArithmeticRight,
+    RotateRight,
 }

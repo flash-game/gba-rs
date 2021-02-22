@@ -1,3 +1,5 @@
+use minifb::Error;
+
 pub struct Register {
     /// Register 0 - 7
     common_reg: [u32; 8],
@@ -205,6 +207,8 @@ pub enum Mode {
 
 impl From<u8> for Mode {
     fn from(mode_u8: u8) -> Self {
+        let option = None;
+        let result = option.ok_or(Err(None));
         match mode_u8 & 0b0001_1111 {
             0b10000 => Mode::User,
             0b10001 => Mode::FastInterrupt,
