@@ -52,7 +52,8 @@ impl<'a> Arm7<'a> {
                 // TODO
             }
             InstructionType::Undefined => {
-                // TODO
+                // Done
+                return;
             }
             InstructionType::SoftwareInterrupt => {
                 // DONE
