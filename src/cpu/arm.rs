@@ -21,118 +21,52 @@ impl<'a> Arm7<'a> {
     }
     pub fn next(&mut self) {
         let old_pc = self.reg.get_pc();
-        let op = self.address_bus.borrow().get_word(self.reg.get_pc());
+        let instruct = self.address_bus.borrow().get_word(self.reg.get_pc());
         self.reg.set_pc(old_pc.wrapping_add(4));
         // cond check
-        if !self.cond_check((op >> 28) as u8) { return; }
-        let instruct_type = get_instruction_type(op);
+        if !self.cond_check((instruct >> 28) as u8) { return; }
+        let instruct_type = get_instruction_type(instruct);
         match instruct_type {
             InstructionType::BranchAndExchange => {
-                let rn = op.extract(0, 4) as u8;
-                let new_pc = self.reg.reg_val(rn);
-                self.reg.set_pc(new_pc & !1u32);
-                // SET ARM or THUMB
-                self.reg.cspr.set_op_type(if new_pc & 0x1 == 0 { OpType::ARM } else { OpType::Thumb });
+                // DONE
             }
             InstructionType::Branch => {
-                let offset = op.extract(0, 24);
-                let s_offset = ((offset << 8) as i32 >> 6) as u32;
-                self.reg.set_pc(old_pc.wrapping_add(s_offset).wrapping_add(8));
-                if op & 0x0100_0000 != 0 {
-                    self.reg.set_lr(old_pc.wrapping_add(4));
-                }
+                // DONE
             }
             InstructionType::SingleDataSwap => {
-                let rm = op.extract(0, 4) as u8;
-                let rd = op.extract(12, 4) as u8;
-                let rn = op.extract(16, 4) as u8;
-                let b = op.get_bit_bool(22);
-                // If it is not a byte operation then force word align
-                let addr = self.reg.reg_val(rn) & !((1 - if b { 1 } else { 2 }) * 3);
-                let addr_mut = self.address_bus.borrow_mut();
-                let addr_val = if b { addr_mut.get_byte(addr) as u32 } else { addr_mut.get_word(addr) };
-                let reg_val = self.reg.reg_val(rm);
-                if b {
-                    addr_mut.set_byte(addr, reg_val as u8)
-                } else {
-                    addr_mut.set_word(addr, reg_val)
-                }
-                self.reg.set_reg(rd, addr_val);
+                // DONE
             }
             InstructionType::Multiply => {
-                let rm = op.extract(0, 4);
-                let rs = op.extract(8, 4);
-                let rn = op.extract(12, 4);
-                let rd = op.extract(16, 4);
-                let a = (op & 0x0020_0000) != 0;
-                let s = (op & 0x0010_0000) != 0;
-                let result = self.reg.reg_val(rm as u8)
-                    .wrapping_mul(self.reg.reg_val(rs as u8))
-                    .wrapping_add(if a { 0 } else { self.reg.reg_val(rn as u8) });
-                self.reg.set_reg(rd as u8, result);
-                // 如果需要更改flag
-                if s {
-                    let new_n = (result & 0x8000_0000) != 0;
-                    self.reg.cspr.set_flag_nzcv(new_n, result == 0, false, self.reg.cspr.flag_v());
-                }
+                // DONE
             }
             InstructionType::HalfwordDataTransfer => {
                 // TODO
             }
             InstructionType::MultiplyLong => {
-                let u = (op & 0x0040_0000) != 0;
-                let a = (op & 0x0020_0000) != 0;
-                let s = (op & 0x0010_0000) != 0;
-                let rdhi = op.extract(16, 4) as u8;
-                let rdlo = op.extract(12, 4) as u8;
-                let rs = op.extract(8, 4);
-                let rm = op.extract(0, 4);
-                let vs_u = self.reg.reg_val(rs as u8);
-                let vm_u = self.reg.reg_val(rm as u8);
-                let result: u64 = if !u {
-                    let prod = (vs_u as u64) * (vm_u as u64);
-                    prod.wrapping_add(if !a { 0u64 } else {
-                        combine64(self.reg.reg_val(rdhi), self.reg.reg_val(rdlo))
-                    })
-                } else {
-                    let prod = (vs_u as i64) * (vm_u as i64);
-                    prod.wrapping_add(if !a { 0i64 } else {
-                        combine64(self.reg.reg_val(rdhi), self.reg.reg_val(rdlo)) as i64
-                    }) as u64
-                };
-                let (reshi, reslo) = split64(result);
-                self.reg.set_reg(rdhi, reshi);
-                self.reg.set_reg(rdlo, reslo);
-                if s {
-                    let new_n = (reshi & 0x8000_0000) != 0;
-                    self.reg.cspr.set_flag_nzcv(new_n, result == 0, false, false);
-                }
+                // DONE
             }
-            InstructionType::CoprocessorDataOperation => {}
-            InstructionType::CoprocessorRegisterTransfer => { () }
-            InstructionType::Undefined => { () }
+            InstructionType::CoprocessorDataOperation => {
+                // TODO
+            }
+            InstructionType::CoprocessorRegisterTransfer => {
+                // TODO
+            }
+            InstructionType::Undefined => {
+                // TODO
+            }
             InstructionType::SoftwareInterrupt => {
-                let old_cpsr = self.reg.cspr.value();
-                let current_pc = old_pc;
-                self.reg.cspr.set_op_type(OpType::ARM);
-                self.reg.cspr.set_mode(Mode::Supervisor);
-                // set irq_disable true
-                self.reg.cspr.set_irq_disable(true);
-                self.reg.set_spsr(old_cpsr);
-                self.reg.set_lr(current_pc);
-                self.reg.set_lr(current_pc); // set LR to the next instruction
-                self.reg.set_pc(0x08);
+                // DONE
             }
             InstructionType::BlockDataTransfer => {
-                let p = op.get_bit_bool(24);
-                let u = op.get_bit_bool(23);
-                let s = op.get_bit_bool(22);
-                let w = op.get_bit_bool(21);
-                let l = op.get_bit_bool(20);
-                let rn = op.extract(16, 4) as u8;
-                let reglist = op.extract(0, 16) as u16;
+                let p = instruct.get_bit_bool(24);
+                let u = instruct.get_bit_bool(23);
+                let s = instruct.get_bit_bool(22);
+                let w = instruct.get_bit_bool(21);
+                let l = instruct.get_bit_bool(20);
+                let rn = instruct.extract(16, 4) as u8;
+                let reglist = instruct.extract(0, 16) as u16;
                 let base_addr = self.reg.reg_val(rn);
-                let addr_mode = (op.extract(20, 5) & 0b1_1001) as u8;
+                let addr_mode = (instruct.extract(20, 5) & 0b1_1001) as u8;
                 let a = |x: u32| {
                     return 1;
                 };
@@ -149,10 +83,14 @@ impl<'a> Arm7<'a> {
                 }
                 //  TODO
             }
-            InstructionType::CoprocessorDataTransfer => { () }
-            InstructionType::DataProcessing => {}
+            InstructionType::CoprocessorDataTransfer => {
+                // TODO
+            }
+            InstructionType::DataProcessing => {
+                // TODO
+            }
             InstructionType::SingleDataTransfer => {
-                let rm = op.extract(16, 4) as u8;
+                let rm = instruct.extract(16, 4) as u8;
                 // TODO
             }
         }
