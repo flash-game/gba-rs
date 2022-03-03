@@ -162,7 +162,7 @@ enum InstructionType {
 }
 
 ///
-const ARM_OPCODE_TABLE: [(u32, u32, InstructionType); 15] = [
+pub const ARM_OPCODE_TABLE: [(u32, u32, InstructionType); 15] = [
     (0x0ffffff0, 0x012fff10, InstructionType::BranchAndExchange),
     (0x0fb00ff0, 0x01000090, InstructionType::SingleDataSwap),
     (0x0fc000f0, 0x00000090, InstructionType::Multiply),
@@ -179,4 +179,8 @@ const ARM_OPCODE_TABLE: [(u32, u32, InstructionType); 15] = [
     (0x0c000000, 0x00000000, InstructionType::DataProcessing),
     (0x0c000000, 0x04000000, InstructionType::SingleDataTransfer),
 ];
+
+fn get() {
+    let x = [[0u8; 16]; 256];
+}
 
