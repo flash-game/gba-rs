@@ -104,22 +104,22 @@ impl<'a> Arm7<'a> {
         let v = self.reg.cspr.flag_v();
         let n = self.reg.cspr.flag_n();
         match cond {
-            /* EQ */ 0x0 => z,
-            /* NE */ 0x1 => !z,
-            /* CS */ 0x2 => c,
-            /* CC */ 0x3 => !c,
-            /* MI */ 0x4 => n,
-            /* PL */ 0x5 => !n,
-            /* VS */ 0x6 => v,
-            /* VC */ 0x7 => !v,
-            /* HI */ 0x8 => c && !z,
+            /* EQ */ 0b0000 => z,
+            /* NE */ 0b0001 => !z,
+            /* CS */ 0b0010 => c,
+            /* CC */ 0b0011 => !c,
+            /* MI */ 0b0100 => n,
+            /* PL */ 0b0101 => !n,
+            /* VS */ 0b0110 => v,
+            /* VC */ 0b0111 => !v,
+            /* HI */ 0b1000 => c && !z,
             // TODO not sure
-            /* LS */ 0x9 => !c || z,
-            /* GE */ 0xA => n == v,
-            /* LT */ 0xB => n != v,
-            /* GT */ 0xC => !z && n == v,
-            /* LE */ 0xD => z || n != v,
-            /* AL */ 0xE | 0xF => true,
+            /* LS */ 0b1001 => !c || z,
+            /* GE */ 0b1010 => n == v,
+            /* LT */ 0b1011 => n != v,
+            /* GT */ 0b1100 => !z && n == v,
+            /* LE */ 0b1101 => z || n != v,
+            /* AL */ 0b1110 | 0xF => true,
             _ => unreachable!(),
         }
     }
