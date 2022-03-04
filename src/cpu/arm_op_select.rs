@@ -1,317 +1,309 @@
 use crate::cpu::arm;
-use crate::cpu::arm_op_select::ArmOrderType::{Add, B, Bl, Cdp, Ldc, Mcr, Mrc, Stc, Swi, Todo};
+use crate::cpu::arm_op_select::ArmOrderType::{ADC, ADD, AND, B, BL, CDP, EOR, LDC, MCR, MRC, MUL, RSB, RSC, SBC, STC, SUB, SWI, TODO, Undefined};
 
 enum ArmOrderType {
     // bool：set flag
-    Add(bool),
-    Swi,
+    AND(bool),
+    // bool：set flag
+    MUL(bool),
+    // bool：set flag
+    EOR(bool),
+    // bool：set flag
+    SUB(bool),
+    // bool：set flag
+    RSB(bool),
+    // bool：set flag
+    ADD(bool),
+    // bool：set flag
+    ADC(bool),
+    SBC(bool),
+    RSC(bool),
+    SWI,
     B,
-    Bl,
-    Stc,
-    Ldc,
-    Mcr,
-    Mrc,
-    Cdp,
-    Todo,
+    BL,
+    STC,
+    LDC,
+    MCR,
+    MRC,
+    CDP,
+    TODO,
+    Undefined,
 }
 
-fn get() {
-    let x = [
-        [Add(false), Add(false), Add(false), Add(false), Add(false), Add(false), Add(false), Add(false), Add(false), Todo, Add(false), Todo, Add(false), Todo, Add(false), Todo], // 0
-        [Add(true), Add(true), Add(true), Add(true), Add(true), Add(true), Add(true), Add(true), Add(true), Todo, Add(true), Todo, Add(true), Todo, Add(true), Todo], // 1
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 2
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 3
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 4
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 5
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 6
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 7
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 8
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 9
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 10
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 11
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 12
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 13
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 14
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 15
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 16
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 17
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 18
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 19
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 20
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 21
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 22
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 23
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 24
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 25
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 26
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 27
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 28
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 29
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 30
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 31
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 32
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 33
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 34
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 35
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 36
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 37
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 38
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 39
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 30
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 31
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 32
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 33
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 34
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 35
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 36
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 37
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 38
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 39
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 40
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 41
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 42
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 43
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 44
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 45
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 46
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 47
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 48
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 49
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 50
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 51
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 52
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 53
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 54
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 55
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 56
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 57
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 58
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 59
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 60
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 61
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 62
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 63
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 64
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 65
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 66
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 67
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 68
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 69
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 70
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 71
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 72
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 73
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 74
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 75
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 76
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 77
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 78
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 79
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 80
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 81
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 82
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 83
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 84
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 85
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 86
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 87
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 88
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 89
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 90
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 91
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 92
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 93
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 94
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 95
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 96
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 97
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 98
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 99
+const TABLE: [[ArmOrderType; 16]; 256] = [
+    [AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), MUL(false), AND(false), TODO, AND(false), TODO, AND(false), TODO], // 0
+    [AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), MUL(true), AND(true), TODO, AND(true), TODO, AND(true), TODO], // 1
+    [EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), TODO, EOR(false), TODO, EOR(false), TODO, EOR(false), TODO], // 2
+    [EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), TODO, EOR(true), TODO, EOR(true), TODO, EOR(true), TODO], // 3
+    [SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), Undefined, SUB(false), TODO, SUB(false), TODO, SUB(false), TODO], // 4
+    [SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), Undefined, SUB(true), TODO, SUB(true), TODO, SUB(true), TODO], // 5
+    [RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), Undefined, RSB(false), TODO, RSB(false), TODO, RSB(false), TODO], // 6
+    [RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), Undefined, RSB(true), TODO, RSB(true), TODO, RSB(true), TODO], // 7
+    [ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), TODO, ADD(false), TODO, ADD(false), TODO, ADD(false), TODO], // 8
+    [ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), TODO, ADD(true), TODO, ADD(true), TODO, ADD(true), TODO], // 9
+    [ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), TODO, ADC(false), TODO, ADC(false), TODO, ADC(false), TODO], // 10
+    [ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), TODO, ADC(true), TODO, ADC(true), TODO, ADC(true), TODO], // 11
+    [SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), TODO, SBC(false), TODO, SBC(false), TODO, SBC(false), TODO], // 12
+    [SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), TODO, SBC(true), TODO, SBC(true), TODO, SBC(true), TODO], // 13
+    [RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), TODO, RSC(false), TODO, RSC(false), TODO, RSC(false), TODO], // 14
+    [RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), TODO, RSC(true), TODO, RSC(true), TODO, RSC(true), TODO], // 15
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 16
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 17
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 18
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 19
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 20
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 21
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 22
 
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 100
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 101
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 102
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 103
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 104
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 105
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 106
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 107
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 108
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 109
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 110
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 111
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 112
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 113
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 114
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 115
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 116
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 117
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 118
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 119
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 120
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 121
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 122
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 123
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 124
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 125
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 126
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 127
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 128
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 129
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 130
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 131
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 132
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 133
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 134
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 135
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 136
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 137
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 138
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 139
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 130
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 131
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 132
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 133
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 134
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 135
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 136
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 137
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 138
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 139
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 140
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 141
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 142
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 143
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 144
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 145
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 146
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 147
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 148
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 149
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 150
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 151
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 152
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 153
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 154
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 155
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 156
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 157
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 158
-        [Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo, Todo], // 159
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 23
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 24
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 25
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 26
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 27
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 28
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 29
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 30
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 31
 
 
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 160
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 161
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 162
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 163
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 164
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 165
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 166
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 167
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 168
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 169
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 170
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 171
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 172
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 173
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 174
-        [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 175
+    [AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false), AND(false)], // 32
+    [AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true), AND(true)], // 33
+    [EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false), EOR(false)], // 34
+    [EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true), EOR(true)], // 35
+    [SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false), SUB(false)], // 36
+    [SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true), SUB(true)], // 37
+    [RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false), RSB(false)], // 38
+    [RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true), RSB(true)], // 39
+    [ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false), ADD(false)], // 40
+    [ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true), ADD(true)], // 41
+    [ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false), ADC(false)], // 42
+    [ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true), ADC(true)], // 43
+    [SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false), SBC(false)], // 44
+    [SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true), SBC(true)], // 45
+    [RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false), RSC(false)], // 46
+    [RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true), RSC(true)], // 47
+
+    [Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined], // 48
+
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 49
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 50
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 51
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 52
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 53
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 54
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 55
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 56
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 57
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 58
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 59
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 60
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 61
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 62
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 63
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 64
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 65
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 66
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 67
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 68
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 69
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 70
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 71
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 72
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 73
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 74
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 75
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 76
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 77
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 78
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 79
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 80
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 81
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 82
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 83
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 84
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 85
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 86
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 87
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 88
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 89
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 90
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 91
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 92
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 93
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 94
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 95
 
 
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 176
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 177
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 178
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 179
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 180
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 181
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 182
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 183
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 184
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 185
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 186
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 187
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 188
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 189
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 190
-        [Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl, Bl], // 191
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 96
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 97
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 98
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 99
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 100
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 101
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 102
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 103
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 104
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 105
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 106
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 107
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 108
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 109
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 110
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 111
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 112
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 113
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 114
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 115
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 116
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 117
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 118
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 119
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 120
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 121
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 122
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 123
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 124
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 125
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 126
+    [TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined, TODO, Undefined], // 127
 
 
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 192
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 193
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 194
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 195
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 196
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 197
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 198
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 199
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 200
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 201
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 202
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 203
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 204
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 205
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 206
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 207
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 208
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 209
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 210
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 211
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 212
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 213
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 214
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 215
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 216
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 217
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 218
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 219
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 220
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 221
-        [Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc, Stc], // 222
-        [Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc, Ldc], // 223
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 128
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 129
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 130
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 131
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 132
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 133
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 134
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 135
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 136
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 137
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 138
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 139
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 140
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 141
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 142
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 143
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 144
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 145
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 146
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 147
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 148
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 149
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 150
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 151
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 152
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 153
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 154
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 155
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 156
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 157
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 158
+    [TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO, TODO], // 159
 
 
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 224
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 225
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 226
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 227
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 228
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 229
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 230
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 231
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 232
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 233
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 234
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 235
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 236
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 237
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 238
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 239
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 230
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 231
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 232
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 233
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 234
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 235
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 236
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 237
-        [Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr, Cdp, Mcr], // 238
-        [Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc, Cdp, Mrc], // 239
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 160
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 161
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 162
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 163
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 164
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 165
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 166
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 167
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 168
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 169
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 170
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 171
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 172
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 173
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 174
+    [B, B, B, B, B, B, B, B, B, B, B, B, B, B, B, B], // 175
 
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 240
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 241
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 242
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 243
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 244
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 245
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 246
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 247
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 248
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 249
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 250
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 251
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 252
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 253
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 254
-        [Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi, Swi], // 255
-    ];
-}
+
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 176
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 177
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 178
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 179
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 180
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 181
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 182
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 183
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 184
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 185
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 186
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 187
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 188
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 189
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 190
+    [BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL, BL], // 191
+
+
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 192
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 193
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 194
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 195
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 196
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 197
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 198
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 199
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 200
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 201
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 202
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 203
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 204
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 205
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 206
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 207
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 208
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 209
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 210
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 211
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 212
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 213
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 214
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 215
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 216
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 217
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 218
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 219
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 220
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 221
+    [STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC, STC], // 222
+    [LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC, LDC], // 223
+
+
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 224
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 225
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 226
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 227
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 228
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 229
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 230
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 231
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 232
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 233
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 234
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 235
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 236
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 237
+    [CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR, CDP, MCR], // 238
+    [CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC, CDP, MRC], // 239
+
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 240
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 241
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 242
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 243
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 244
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 245
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 246
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 247
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 248
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 249
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 250
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 251
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 252
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 253
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 254
+    [SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI, SWI], // 255
+];
+
