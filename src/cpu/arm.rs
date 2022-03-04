@@ -153,7 +153,7 @@ enum InstructionType {
     BlockDataTransfer,
     // B,BL
     Branch,
-    // CDP
+    // CDP  LDC, STC
     CoprocessorDataTransfer,
     // ADC,ADD,AND,BIC,CMN,CMP,EOR,MOV,MVN,ORR,RSB,RSC,SBC,SUB,TEQ,TST
     DataProcessing,

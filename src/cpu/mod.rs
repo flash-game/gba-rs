@@ -1,6 +1,6 @@
 mod reg;
 mod addrbus;
-mod cpu;
+mod arm_op_select;
 pub mod mem;
 mod arm;
 mod arm_op;
