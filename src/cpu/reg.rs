@@ -124,7 +124,7 @@ impl Register {
             0xD => self.get_sp(),
             0xE => self.get_lr(),
             0xF => self.get_pc(),
-            n => { panic!(format!("Error register number 0x{:X}", n)); }
+            n => unreachable!()
         }
     }
 
