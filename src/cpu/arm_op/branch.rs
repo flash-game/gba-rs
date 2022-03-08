@@ -1,11 +1,10 @@
-use crate::cpu::arm_op::instruct_execute::InstructExecute;
-use crate::cpu::reg::Register;
 use fantasy_util::bit::usize::BitUtil;
+
+use crate::cpu::reg::Register;
 
 struct Branch {}
 
 impl Branch {
-    ///
     ///
     fn execute(instruct: u32, reg: &mut Register, old_pc: u32) {
         let offset = instruct.extract(0, 24);
@@ -14,7 +13,7 @@ impl Branch {
         reg.set_pc(old_pc.wrapping_add(s_offset).wrapping_add(8));
         if instruct & 0x0100_0000 != 0 {
             // TODO 不知道为什么add4
-            reg.set_lr(old_pc.wrapping_add(4));
+            reg.set_lr(old_pc.wrapping _add(4));
         }
         unimplemented!()
     }

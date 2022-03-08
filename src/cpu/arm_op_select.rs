@@ -1,4 +1,3 @@
-use crate::cpu::arm;
 use crate::cpu::arm_op_select::ArmOrderType::{ADC___, ADD___, AND___, B________, BIC___, BL_______, BX_______, CDP______, CMNS_____, CMPS_____, EOR___, LDC______, LDRB_____, LDRBT____, LDRH_____, LDRSB____, LDRSH____, LDRT_____, MCR______, MOV___, MRC______, MRS______, MSR______, MUL___, MVN___, ORR___, RSB___, RSC___, SBC___, STC______, STR______, STRB_____, STRBT____, STRH_____, STRT_____, SUB___, SWI______, TEQS_____, TODO_____, TSTS_____, Undefined};
 
 enum ArmOrderType {

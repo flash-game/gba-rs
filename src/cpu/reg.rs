@@ -217,7 +217,7 @@ impl From<u8> for Mode {
             0b10111 => Mode::Abort,
             0b11011 => Mode::Undefined,
             0b11111 => Mode::System,
-            n => panic!(format!("Unknow mode 0x{:X}", n))
+            n => panic!(format!("unknown mode 0x{:X}", n))
         }
     }
 }

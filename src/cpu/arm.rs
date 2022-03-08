@@ -4,8 +4,7 @@ use std::rc::Rc;
 use fantasy_util::bit::usize::BitUtil;
 
 use crate::cpu::addrbus::AddressBus;
-use crate::cpu::reg::{Mode, OpType, Register};
-use crate::util::{combine64, split64};
+use crate::cpu::reg::Register;
 
 pub struct Arm7<'a> {
     reg: &'a mut Register,
@@ -19,6 +18,7 @@ impl<'a> Arm7<'a> {
             address_bus,
         }
     }
+
     pub fn next(&mut self) {
         let old_pc = self.reg.get_pc();
         let instruct = self.address_bus.borrow().get_word(self.reg.get_pc());
