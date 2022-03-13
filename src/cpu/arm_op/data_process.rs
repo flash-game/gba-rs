@@ -3,22 +3,21 @@ use std::sync::{Arc, Mutex};
 use fantasy_util::bit::usize::BitUtil;
 
 use crate::cpu::arm_op::instruct_execute::InstructExecute;
+use crate::cpu::arm_op_table::ArmOpType;
 use crate::cpu::reg::Register;
 
 struct DataProcess {}
 
-impl InstructExecute for DataProcess {
-    fn execute(op: u32, reg: &mut Register) {
-        let i = op.get_bit_bool(25);
+impl DataProcess {
+    fn execute(op: u32, reg: &mut Register, op_type: ArmOpType) {
         let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
         let s = op.get_bit_bool(20);
         let rn = op.extract(16, 4) as u8;
         let rd = op.extract(12, 4) as u8;
         let operand2 = op.extract(0, 12);
-        if i {
-            // 立即数
-            let imm = op.extract(0, 8) as u8;
-            // 立即数
+        if op.get_bit_bool(25) { // 立即数
+            let imm = op & 0b1111_1111;
+            let rotate = op.extract(8, 4);
         } else {
             let rm = op.extract(0, 4) as u8;
             let rm_val = reg.reg_val(rm);

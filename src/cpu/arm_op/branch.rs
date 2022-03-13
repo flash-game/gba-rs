@@ -15,6 +15,5 @@ impl Branch {
             // 将下一条指令放入lr中
             reg.set_lr(old_pc.wrapping_add(4));
         }
-        unimplemented!()
     }
 }
