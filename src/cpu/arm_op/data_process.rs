@@ -12,24 +12,7 @@ impl DataProcess {
     fn execute(op: u32, reg: &mut Register, op_type: ArmOpType) {
         let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
         let s = op.get_bit_bool(20);
-        let rn = op.extract(16, 4) as u8;
-        let rd = op.extract(12, 4) as u8;
-        let operand2 = op.extract(0, 12);
-        if op.get_bit_bool(25) { // 立即数
-            let imm = op & 0b1111_1111;
-            let rotate = op.extract(8, 4);
-        } else {
-            let rm = op.extract(0, 4) as u8;
-            let rm_val = reg.reg_val(rm);
-            let bit5 = op.get_bit_bool(4);
-            let shift_amount = if bit5 {
-                let rs = op.extract(8, 4) as u8;
-                reg.reg_val(rs) as u8 & 0b00011111
-            } else {
-                op.extract(7, 5) as u8
-            };
-            // 寄存器移位
-        }
+
         let operand1 = reg.reg_val(rn);
         // resutls ( 0:result value   1:flag_C   2:flag_V )
         let results: (u32, bool, bool) = match opcode_type {
@@ -64,6 +47,29 @@ impl DataProcess {
             }
         } else if !s && rd == 15 {
             reg.set_reg(rd, results.0)
+        }
+    }
+
+    fn add(set_cond: bool) {}
+
+    fn base_info(op: u32, reg: &mut Register) {
+        let rn = op.extract(16, 4) as u8;
+        let rd = op.extract(12, 4) as u8;
+        if op.get_bit_bool(25) { // 立即数
+            let imm = op & 0b1111_1111;
+            let rotate = op.extract(8, 4);
+            // TODO
+        } else {
+            let rm = op.extract(0, 4) as u8;
+            let rm_val = reg.reg_val(rm);
+            let bit5 = op.get_bit_bool(4);
+            let shift_amount = if bit5 {
+                let rs = op.extract(8, 4) as u8;
+                reg.reg_val(rs) as u8 & 0b00011111
+            } else {
+                op.extract(7, 5) as u8
+            };
+            // 寄存器移位
         }
     }
 }
