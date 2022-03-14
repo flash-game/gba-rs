@@ -20,7 +20,7 @@ impl Multiply {
         // 如果需要更改flag
         if s {
             let new_n = (result & 0x8000_0000) != 0;
-            reg.cspr.set_flag_nzcv(new_n, result == 0, false, reg.cspr.flag_v());
+            reg.cpsr.set_flag_nzcv(new_n, result == 0, false, reg.cpsr.flag_v());
         }
     }
 }

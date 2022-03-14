@@ -38,7 +38,7 @@ impl MultiplyLong {
         reg.set_reg(rdlo, rdlo_val);
         if s {
             let new_n = (reshi & 0x8000_0000) != 0;
-            reg.cspr.set_flag_nzcv(new_n, result == 0, false, false);
+            reg.cpsr.set_flag_nzcv(new_n, result == 0, false, false);
         }
     }
 }

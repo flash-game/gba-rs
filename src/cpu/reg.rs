@@ -29,7 +29,7 @@ pub struct Register {
     r13_fiq: u32,
     r14_fiq: u32,
 
-    pub cspr: CPSR,
+    pub cpsr: CPSR,
     ///
     spsr_svc: u32,
     spsr_abt: u32,
@@ -53,7 +53,7 @@ impl Register {
     }
 
     pub fn get_sp(&self) -> u32 {
-        return match self.cspr.mode() {
+        return match self.cpsr.mode() {
             Mode::User | Mode::System => self.r13,
             Mode::FastInterrupt => self.r13_fiq,
             Mode::Interrupt => self.r13_irq,
@@ -64,7 +64,7 @@ impl Register {
     }
 
     pub fn set_sp(&mut self, sp: u32) {
-        match self.cspr.mode() {
+        match self.cpsr.mode() {
             Mode::User | Mode::System => self.r13 = sp,
             Mode::FastInterrupt => self.r13_fiq = sp,
             Mode::Interrupt => self.r13_irq = sp,
@@ -77,7 +77,7 @@ impl Register {
     ///
     /// Get Link register
     pub fn get_lr(&self) -> u32 {
-        return match self.cspr.mode() {
+        return match self.cpsr.mode() {
             Mode::User | Mode::System => self.r14,
             Mode::FastInterrupt => self.r14_fiq,
             Mode::Interrupt => self.r14_irq,
@@ -89,7 +89,7 @@ impl Register {
 
     /// Set Link register
     pub fn set_lr(&mut self, lr: u32) {
-        match self.cspr.mode() {
+        match self.cpsr.mode() {
             Mode::User | Mode::System => self.r14 = lr,
             Mode::FastInterrupt => self.r14_fiq = lr,
             Mode::Interrupt => self.r14_irq = lr,
@@ -104,7 +104,7 @@ impl Register {
     pub fn set_reg(&mut self, rn: u8, val: u32) {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize] = val,
-            0x8..=0xC => if self.cspr.mode == Mode::FastInterrupt {
+            0x8..=0xC => if self.cpsr.mode == Mode::FastInterrupt {
                 self.high_fiq_reg[(rn - 8) as usize] = val
             } else { self.high_common_reg[(rn - 8) as usize] = val }
             0xD => self.set_sp(val),
@@ -118,7 +118,7 @@ impl Register {
     pub fn reg_val(&mut self, rn: u8) -> u32 {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize],
-            0x8..=0xC => if self.cspr.mode == Mode::FastInterrupt {
+            0x8..=0xC => if self.cpsr.mode == Mode::FastInterrupt {
                 self.high_fiq_reg[(rn - 8) as usize]
             } else { self.high_common_reg[(rn - 8) as usize] }
             0xD => self.get_sp(),
@@ -133,7 +133,7 @@ impl Register {
 
 
     pub fn spsr(&self) -> u32 {
-        match self.cspr.mode() {
+        match self.cpsr.mode() {
             Mode::FastInterrupt => self.spsr_fiq,
             Mode::Interrupt => self.spsr_irq,
             Mode::Supervisor => self.spsr_svc,
@@ -144,7 +144,7 @@ impl Register {
     }
 
     pub fn set_spsr(&mut self, spsr_val: u32) {
-        match self.cspr.mode() {
+        match self.cpsr.mode() {
             Mode::FastInterrupt => self.spsr_fiq = spsr_val,
             Mode::Interrupt => self.spsr_irq = spsr_val,
             Mode::Supervisor => self.spsr_svc = spsr_val,
@@ -175,7 +175,7 @@ impl Register {
             r14_irq: 0,
             r13_fiq: 0,
             r14_fiq: 0,
-            cspr: CPSR::new(),
+            cpsr: CPSR::new(),
             spsr_svc: 0,
             spsr_abt: 0,
             spsr_und: 0,

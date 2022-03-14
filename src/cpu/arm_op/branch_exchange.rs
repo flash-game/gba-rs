@@ -9,5 +9,5 @@ fn execute(instruct: u32, reg: &mut Register) {
     let new_pc = reg.reg_val(rn);
     reg.set_pc(new_pc & !1u32);
     // SET ARM or THUMB
-    reg.cspr.set_op_type(if new_pc & 0b1 == 0 { OpType::ARM } else { OpType::Thumb });
+    reg.cpsr.set_op_type(if new_pc & 0b1 == 0 { OpType::ARM } else { OpType::Thumb });
 }

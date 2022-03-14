@@ -39,9 +39,9 @@ impl DataProcess {
             if rd != 15 {
                 let new_n = (results.0 as i32) < 0;
                 // TODO flag_c,flag_v
-                reg.cspr.set_flag_nzcv(new_n, results.0 == 0, results.1, results.2);
+                reg.cpsr.set_flag_nzcv(new_n, results.0 == 0, results.1, results.2);
             } else {
-                reg.cspr.set_val(reg.spsr())
+                reg.cpsr.set_val(reg.spsr())
                 // self.reg[reg::CPSR] = self.reg[reg::SPSR];
                 // self.reg.update_bank();
             }
@@ -55,14 +55,20 @@ impl DataProcess {
     fn base_info(op: u32, reg: &mut Register) {
         let rn = op.extract(16, 4) as u8;
         let rd = op.extract(12, 4) as u8;
-        if op.get_bit_bool(25) { // 立即数
+        let operand1 = if op.get_bit_bool(25) { // 立即数
             let imm = op & 0b1111_1111;
             let rotate = op.extract(8, 4);
-            // TODO
+            imm.rotate_right(rotate * 2)
         } else {
-            let rm = op.extract(0, 4) as u8;
+            let rm = (op & 0b1111) as u8;
             let rm_val = reg.reg_val(rm);
-            let bit5 = op.get_bit_bool(4);
+            let shift_type = op.extract(5, 2);
+            if op.get_bit_bool(4) {
+
+            }else {
+
+            }
+            reg.cpsr
             let shift_amount = if bit5 {
                 let rs = op.extract(8, 4) as u8;
                 reg.reg_val(rs) as u8 & 0b00011111

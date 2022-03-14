@@ -99,10 +99,10 @@ impl<'a> Arm7<'a> {
 
 
     fn cond_check(&self, cond: u8) -> bool {
-        let z = self.reg.cspr.flag_z();
-        let c = self.reg.cspr.flag_c();
-        let v = self.reg.cspr.flag_v();
-        let n = self.reg.cspr.flag_n();
+        let z = self.reg.cpsr.flag_z();
+        let c = self.reg.cpsr.flag_c();
+        let v = self.reg.cpsr.flag_v();
+        let n = self.reg.cpsr.flag_n();
         match cond {
             /* EQ */ 0b0000 => z,
             /* NE */ 0b0001 => !z,
