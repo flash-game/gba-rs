@@ -68,7 +68,6 @@ impl DataProcess {
             }else {
 
             }
-            reg.cpsr
             let shift_amount = if bit5 {
                 let rs = op.extract(8, 4) as u8;
                 reg.reg_val(rs) as u8 & 0b00011111
