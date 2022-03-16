@@ -52,10 +52,11 @@ impl DataProcess {
 
     fn add(set_cond: bool) {}
 
-    fn base_info(op: u32, reg: &mut Register) {
+    fn base_info(op: u32, reg: &mut Register) -> InternalBase {
         let rn = op.extract(16, 4) as u8;
+        let operand1 = reg.reg_val(rn);
         let rd = op.extract(12, 4) as u8;
-        let operand1 = if op.get_bit_bool(25) { // 立即数
+        let operand2 = if op.get_bit_bool(25) { // 立即数
             let imm = op & 0b1111_1111;
             let rotate = op.extract(8, 4);
             imm.rotate_right(rotate * 2)
@@ -64,19 +65,26 @@ impl DataProcess {
             let rm_val = reg.reg_val(rm);
             let shift_type = op.extract(5, 2);
             if op.get_bit_bool(4) {
-
-            }else {
-
-            }
-            let shift_amount = if bit5 {
                 let rs = op.extract(8, 4) as u8;
-                reg.reg_val(rs) as u8 & 0b00011111
+                let rs_val = reg.reg_val(rs) as u8 & 0b00011111;
             } else {
-                op.extract(7, 5) as u8
-            };
+                let shift_amount = op.extract(7, 5) as u8;
+            }
+            1
             // 寄存器移位
+        };
+        InternalBase {
+            operand1,
+            operand2,
+            rd,
         }
     }
+}
+
+struct InternalBase {
+    operand1: u32,
+    operand2: u32,
+    rd: u8,
 }
 
 enum OpcodeType {
