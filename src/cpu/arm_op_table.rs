@@ -2,6 +2,7 @@ use crate::cpu::arm_op_table::ArmOpType::{ADC______, ADCS_____, ADD______, ADDS_
 
 pub fn select_instruct() {}
 
+#[derive(Copy, Clone)]
 pub enum ArmOpType {
     BLX______,
     SMLALBT__,
@@ -108,7 +109,7 @@ pub enum ArmOpType {
     Undefined,
 }
 
-const TABLE: [[ArmOpType; 16]; 256] = [
+pub const TABLE: [[ArmOpType; 16]; 256] = [
     [AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, MUL______, AND______, STRH_____, AND______, LDRD_____, AND______, STRD_____],  // 0
     [ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, MULS_____, ANDS_____, LDRH_____, ANDS_____, LDRSB____, ANDS_____, LDRSH____],  // 1
     [EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, MLA______, EOR______, STRH_____, EOR______, LDRD_____, EOR______, STRD_____],  // 2

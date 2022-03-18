@@ -4,7 +4,7 @@ use crate::cpu::reg::{OpType, Register};
 /// |31    28|                                                                 |3  0|
 /// |  cond  |                                                                 | Rn |
 /// ---------------------------------------------------------------------------------
-fn execute(instruct: u32, reg: &mut Register) {
+pub fn bx_execute(instruct: u32, reg: &mut Register) {
     let rn = (instruct & 0b1111) as u8;
     let new_pc = reg.reg_val(rn);
     reg.set_pc(new_pc & !1u32);

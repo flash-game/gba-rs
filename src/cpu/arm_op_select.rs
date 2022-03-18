@@ -1,6 +1,7 @@
 use crate::cpu::arm_op_select::ArmOrderType::{ADC___, ADD___, AND___, B________, BIC___, BL_______, BX_______, CDP______, CMNS_____, CMPS_____, EOR___, LDC______, LDRB_____, LDRBT____, LDRH_____, LDRSB____, LDRSH____, LDRT_____, MCR______, MOV___, MRC______, MRS______, MSR______, MUL___, MVN___, ORR___, RSB___, RSC___, SBC___, STC______, STR______, STRB_____, STRBT____, STRH_____, STRT_____, SUB___, SWI______, TEQS_____, TODO_____, TSTS_____, Undefined};
 
-enum ArmOrderType {
+#[derive(Copy, Clone)]
+pub enum ArmOrderType {
     AND___(u8),
     MUL___(u8),
     EOR___(u8),
@@ -47,7 +48,7 @@ enum ArmOrderType {
     Undefined,
 }
 
-const TABLE: [[ArmOrderType; 16]; 256] = [
+ const TABLE: [[ArmOrderType; 16]; 256] = [
     [AND___(0), AND___(0), AND___(0), AND___(0), AND___(0), AND___(0), AND___(0), AND___(0), AND___(0), MUL___(0), AND___(0), STRH_____, AND___(0), TODO_____, AND___(0), TODO_____], // 0
     [AND___(1), AND___(1), AND___(1), AND___(1), AND___(1), AND___(1), AND___(1), AND___(1), AND___(1), MUL___(1), AND___(1), LDRH_____, AND___(1), LDRSB____, AND___(1), LDRSH____], // 1
     [EOR___(0), EOR___(0), EOR___(0), EOR___(0), EOR___(0), EOR___(0), EOR___(0), EOR___(0), EOR___(0), TODO_____, EOR___(0), STRH_____, EOR___(0), TODO_____, EOR___(0), TODO_____], // 2

@@ -2,14 +2,13 @@ use std::sync::{Arc, Mutex};
 
 use fantasy_util::bit::usize::BitUtil;
 
-use crate::cpu::arm_op::instruct_execute::InstructExecute;
 use crate::cpu::arm_op_table::ArmOpType;
 use crate::cpu::reg::Register;
 
 struct DataProcess {}
 
 impl DataProcess {
-    fn execute(op: u32, reg: &mut Register, op_type: ArmOpType) {
+    pub fn execute(op: u32, reg: &mut Register, op_type: ArmOpType) {
         let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
         let s = op.get_bit_bool(20);
 
@@ -50,14 +49,28 @@ impl DataProcess {
         }
     }
 
-    fn add(set_cond: bool, op: u32, reg: &mut Register) {
-        let (operand1, operand2, rd) = DataProcess::base_info(op, reg);
+    fn add(set_flag: bool, op: u32, reg: &mut Register) {
+        let (operand1, rd) = base(op, reg);
     }
 
-    fn base_info(op: u32, reg: &mut Register) -> (u32, u32, u8) {
-        let rn = op.extract(16, 4) as u8;
-        let operand1 = reg.reg_val(rn);
-        let rd = op.extract(12, 4) as u8;
+    fn teq(op: u32, reg: &mut Register) {
+        let (operand1, rd) = base(op, reg);
+    }
+
+    fn tst(op: u32, reg: &mut Register) {
+        let (operand1, rd) = base(op, reg);
+    }
+
+    fn cmp(op: u32, reg: &mut Register) {
+        let (operand1, rd) = base(op, reg);
+    }
+
+    fn cmn(op: u32, reg: &mut Register) {
+        let (operand1, rd) = base(op, reg);
+    }
+
+
+    fn base_logical(op: u32, reg: &mut Register) {
         let operand2 = if op.get_bit_bool(25) { // 立即数
             let imm = op & 0b1111_1111;
             let rotate = op.extract(8, 4);
@@ -80,9 +93,16 @@ impl DataProcess {
                 _ => unreachable!()
             }
         };
-        (operand1, operand2, rd)
     }
 }
+
+fn base(op: u32, reg: &mut Register) -> (u32, u8) {
+    let rn = op.extract(16, 4) as u8;
+    let operand1 = reg.reg_val(rn);
+    let rd = op.extract(12, 4) as u8;
+    (operand1, rd)
+}
+
 
 struct InternalBase {
     operand1: u32,
