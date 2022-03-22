@@ -1,5 +1,3 @@
-use minifb::Error;
-
 pub struct Register {
     /// Register 0 - 7
     common_reg: [u32; 8],
@@ -301,6 +299,7 @@ impl CPSR {
 
     pub fn mode(&self) -> &Mode { &self.mode }
 
+    /// 设置当前处理器模式
     pub fn set_mode(&mut self, mode: Mode) {
         let mode_u32 = (mode as u32).clone();
         self.cpsr_val = self.cpsr_val & 0xFFFF_FFE0 | mode_u32;

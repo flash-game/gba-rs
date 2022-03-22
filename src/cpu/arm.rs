@@ -6,6 +6,8 @@ use fantasy_util::bit::usize::BitUtil;
 use crate::cpu::addrbus::AddressBus;
 use crate::cpu::arm_op::branch::Branch;
 use crate::cpu::arm_op::branch_exchange::bx_execute;
+use crate::cpu::arm_op::software_interrupt::SoftwareInterrupt;
+use crate::cpu::arm_op::swp::SingleDataSwap;
 use crate::cpu::arm_op_table::{ArmOpType, TABLE};
 use crate::cpu::reg::Register;
 
@@ -23,9 +25,11 @@ impl<'a> Arm7<'a> {
     }
 
     pub fn next(&mut self) {
-        let old_pc = self.reg.get_pc();
-        let instruct = self.address_bus.borrow().get_word(self.reg.get_pc());
-        self.reg.set_pc(old_pc.wrapping_add(4));
+        let reg = self.reg;
+        let old_pc = reg.get_pc();
+        let addr_bus = self.address_bus.borrow().as_ref();
+        let instruct = addr_bus.get_word(reg.get_pc());
+        reg.set_pc(old_pc.wrapping_add(4));
         // cond check
         if !self.cond_check((instruct >> 28) as u8) { return; }
         let instruct_type = get_instruction_type(instruct);
@@ -47,8 +51,8 @@ impl<'a> Arm7<'a> {
             ArmOpType::STMDB____ => {}
             ArmOpType::STMIB____ => {}
             ArmOpType::ADC______ => {}
-            ArmOpType::B________ => Branch::execute(instruct, self.reg, old_pc, false),
-            ArmOpType::BL_______ => Branch::execute(instruct, self.reg, old_pc, true),
+            ArmOpType::B________ => Branch::execute(instruct, reg, old_pc, false),
+            ArmOpType::BL_______ => Branch::execute(instruct, reg, old_pc, true),
             ArmOpType::SMLAWT___ => {}
             ArmOpType::STR______ => {}
             ArmOpType::STRT_____ => {}
@@ -80,7 +84,7 @@ impl<'a> Arm7<'a> {
             ArmOpType::SBC______ => {}
             ArmOpType::SUB______ => {}
             ArmOpType::SMLALS___ => {}
-            ArmOpType::BX_______ => bx_execute(instruct, self.reg),
+            ArmOpType::BX_______ => bx_execute(instruct, reg),
             ArmOpType::MOVS_____ => {}
             ArmOpType::MLA______ => {}
             ArmOpType::EORS_____ => {}
@@ -108,7 +112,7 @@ impl<'a> Arm7<'a> {
             ArmOpType::SMULWT___ => {}
             ArmOpType::ADDS_____ => {}
             ArmOpType::ORRS_____ => {}
-            ArmOpType::SWI______ => {}
+            ArmOpType::SWI______ => SoftwareInterrupt::execute(reg, old_pc),
             ArmOpType::BIC______ => {}
             ArmOpType::MOV______ => {}
             ArmOpType::CMPS_____ => {}
@@ -117,9 +121,9 @@ impl<'a> Arm7<'a> {
             ArmOpType::UMULLS___ => {}
             ArmOpType::LDC______ => {}
             ArmOpType::SMULTB___ => {}
-            ArmOpType::SWP______ => {}
+            ArmOpType::SWP______ => SingleDataSwap::execute(false, instruct, reg, addr_bus),
             ArmOpType::SMULBB___ => {}
-            ArmOpType::SWPB_____ => {}
+            ArmOpType::SWPB_____ => SingleDataSwap::execute(true, instruct, reg, addr_bus),
             ArmOpType::UMULL____ => {}
             ArmOpType::SMLALTT__ => {}
             ArmOpType::SMULBT___ => {}

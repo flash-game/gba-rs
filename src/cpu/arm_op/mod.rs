@@ -8,3 +8,4 @@ pub mod branch_exchange;
 pub mod multiply_long;
 pub mod software_interrupt;
 pub mod singledata_transfer;
+pub mod cdp;

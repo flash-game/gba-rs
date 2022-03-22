@@ -1,11 +1,11 @@
 use crate::cpu::reg::{Register, OpType, Mode};
 
-struct SoftwareInterrupt {}
+pub struct SoftwareInterrupt {}
 
 impl SoftwareInterrupt {
     ///
-    ///
-    fn execute(reg: &mut Register, old_pc: u32) {
+    /// TODO 等待校验
+    pub fn execute(reg: &mut Register, old_pc: u32) {
         let old_cpsr = reg.cpsr.value();
         let current_pc = old_pc;
         reg.cpsr.set_op_type(OpType::ARM);
