@@ -32,22 +32,3 @@ pub trait Memory {
         self.set_half_word(addr + 1, (val >> 16) as u16)
     }
 }
-
-/// Abstract of memory
-pub trait RawMemory {
-    //---------------------GET-----------------------
-
-    fn get_byte(&self, addr: u32) -> u8;
-
-    fn get_half_word(&self, addr: u32) -> [u8; 2];
-
-    fn get_word(&self, addr: u32) -> &[u8];
-
-    //---------------------SET-----------------------
-
-    fn set_byte(&self, addr: u32, val: u8);
-
-    fn set_half_word(&self, addr: u32, val: u16);
-
-    fn set_word(&self, addr: u32, val: u32);
-}

@@ -6,18 +6,20 @@ use fantasy_util::bit::usize::BitUtil;
 use crate::cpu::addrbus::AddressBus;
 use crate::cpu::arm_op::branch::Branch;
 use crate::cpu::arm_op::branch_exchange::bx_execute;
+use crate::cpu::arm_op::data_process::DataProcess;
 use crate::cpu::arm_op::software_interrupt::SoftwareInterrupt;
 use crate::cpu::arm_op::swp::SingleDataSwap;
 use crate::cpu::arm_op_table::{ArmOpType, TABLE};
+use crate::cpu::mem::Memory;
 use crate::cpu::reg::Register;
 
 pub struct Arm7<'a> {
     reg: &'a mut Register,
-    address_bus: RefCell<Rc<dyn AddressBus>>,
+    address_bus: &'a mut dyn AddressBus,
 }
 
 impl<'a> Arm7<'a> {
-    pub fn new(reg: &'a mut Register, address_bus: RefCell<Rc<dyn AddressBus>>) -> Self {
+    pub fn new(reg: &'a mut Register, address_bus: &'a mut dyn AddressBus) -> Self {
         Self {
             reg,
             address_bus,
@@ -25,11 +27,9 @@ impl<'a> Arm7<'a> {
     }
 
     pub fn next(&mut self) {
-        let reg = self.reg;
-        let old_pc = reg.get_pc();
-        let addr_bus = self.address_bus.borrow().as_ref();
-        let instruct = addr_bus.get_word(reg.get_pc());
-        reg.set_pc(old_pc.wrapping_add(4));
+        let old_pc = self.reg.get_pc();
+        let instruct = self.address_bus.get_word(self.reg.get_pc());
+        self.reg.set_pc(old_pc.wrapping_add(4));
         // cond check
         if !self.cond_check((instruct >> 28) as u8) { return; }
         let instruct_type = get_instruction_type(instruct);
@@ -43,7 +43,7 @@ impl<'a> Arm7<'a> {
             ArmOpType::UMLAL____ => {}
             ArmOpType::SMULLS___ => {}
             ArmOpType::RSC______ => {}
-            ArmOpType::ADD______ => {}
+            ArmOpType::ADD______ => DataProcess::add(false, instruct, self.reg),
             ArmOpType::MRS______ => {}
             ArmOpType::MSR______ => {}
             ArmOpType::SMLATB___ => {}
@@ -51,8 +51,8 @@ impl<'a> Arm7<'a> {
             ArmOpType::STMDB____ => {}
             ArmOpType::STMIB____ => {}
             ArmOpType::ADC______ => {}
-            ArmOpType::B________ => Branch::execute(instruct, reg, old_pc, false),
-            ArmOpType::BL_______ => Branch::execute(instruct, reg, old_pc, true),
+            ArmOpType::B________ => Branch::execute(instruct, self.reg, old_pc, false),
+            ArmOpType::BL_______ => Branch::execute(instruct, self.reg, old_pc, true),
             ArmOpType::SMLAWT___ => {}
             ArmOpType::STR______ => {}
             ArmOpType::STRT_____ => {}
@@ -84,7 +84,7 @@ impl<'a> Arm7<'a> {
             ArmOpType::SBC______ => {}
             ArmOpType::SUB______ => {}
             ArmOpType::SMLALS___ => {}
-            ArmOpType::BX_______ => bx_execute(instruct, reg),
+            ArmOpType::BX_______ => bx_execute(instruct, self.reg),
             ArmOpType::MOVS_____ => {}
             ArmOpType::MLA______ => {}
             ArmOpType::EORS_____ => {}
@@ -92,7 +92,7 @@ impl<'a> Arm7<'a> {
             ArmOpType::SMLABB___ => {}
             ArmOpType::LDMDA____ => {}
             ArmOpType::RSB______ => {}
-            ArmOpType::TSTS_____ => {}
+            ArmOpType::TSTS_____ => DataProcess::tst(instruct, self.reg),
             ArmOpType::MVN______ => {}
             ArmOpType::QSUB_____ => {}
             ArmOpType::QADD_____ => {}
@@ -110,28 +110,28 @@ impl<'a> Arm7<'a> {
             ArmOpType::CLZ______ => {}
             ArmOpType::LDMDB____ => {}
             ArmOpType::SMULWT___ => {}
-            ArmOpType::ADDS_____ => {}
+            ArmOpType::ADDS_____ => DataProcess::add(true, instruct, self.reg),
             ArmOpType::ORRS_____ => {}
-            ArmOpType::SWI______ => SoftwareInterrupt::execute(reg, old_pc),
+            ArmOpType::SWI______ => SoftwareInterrupt::execute(self.reg, old_pc),
             ArmOpType::BIC______ => {}
             ArmOpType::MOV______ => {}
-            ArmOpType::CMPS_____ => {}
+            ArmOpType::CMPS_____ => DataProcess::cmp(instruct, self.reg),
             ArmOpType::BKPT_____ => {}
             ArmOpType::SMLABT___ => {}
             ArmOpType::UMULLS___ => {}
             ArmOpType::LDC______ => {}
             ArmOpType::SMULTB___ => {}
-            ArmOpType::SWP______ => SingleDataSwap::execute(false, instruct, reg, addr_bus),
+            ArmOpType::SWP______ => SingleDataSwap::execute(false, instruct, self.reg, self.address_bus),
             ArmOpType::SMULBB___ => {}
-            ArmOpType::SWPB_____ => SingleDataSwap::execute(true, instruct, reg, addr_bus),
+            ArmOpType::SWPB_____ => SingleDataSwap::execute(true, instruct, self.reg, self.address_bus),
             ArmOpType::UMULL____ => {}
             ArmOpType::SMLALTT__ => {}
             ArmOpType::SMULBT___ => {}
-            ArmOpType::CMNS_____ => {}
+            ArmOpType::CMNS_____ => DataProcess::tst(instruct, self.reg),
             ArmOpType::SMLALBB__ => {}
             ArmOpType::ORR______ => {}
             ArmOpType::LDMIB____ => {}
-            ArmOpType::TEQS_____ => {}
+            ArmOpType::TEQS_____ => DataProcess::teq(instruct, self.reg),
             ArmOpType::Undefined => {}
         }
     }

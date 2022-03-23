@@ -1,6 +1,7 @@
 use fantasy_util::bit::usize::BitUtil;
 
 use crate::cpu::addrbus::AddressBus;
+use crate::cpu::mem::Memory;
 use crate::cpu::reg::Register;
 
 pub struct SingleDataSwap {}
@@ -8,7 +9,7 @@ pub struct SingleDataSwap {}
 impl SingleDataSwap {
     ///
     ///
-    pub fn execute(swap_byte: bool, instruct: u32, reg: &mut Register, addr_bus: &dyn AddressBus) {
+    pub fn execute(swap_byte: bool, instruct: u32, reg: &mut Register, addr_bus: &mut dyn AddressBus) {
         let rm = (instruct & 0b1111) as u8;
         let rd = instruct.extract(12, 4) as u8;
         let rn = instruct.extract(16, 4) as u8;

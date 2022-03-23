@@ -3,6 +3,7 @@ use fantasy_util::bit::usize::BitUtil;
 
 mod cpu;
 mod util;
+mod gba;
 
 fn main() {
     let i = !((1 - 0) * 3) as u32;

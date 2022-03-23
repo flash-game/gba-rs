@@ -36,9 +36,10 @@ impl MultiplyLong {
         let (rdhi_val, rdlo_val) = split64(result);
         reg.set_reg(rdhi, rdhi_val);
         reg.set_reg(rdlo, rdlo_val);
-        if s {
-            let new_n = (reshi & 0x8000_0000) != 0;
-            reg.cpsr.set_flag_nzcv(new_n, result == 0, false, false);
-        }
+        // TODO
+        // if s {
+        //     let new_n = (reshi & 0x8000_0000) != 0;
+        //     reg.cpsr.set_flag_nzcv(new_n, result == 0, false, false);
+        // }
     }
 }

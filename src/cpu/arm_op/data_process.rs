@@ -5,67 +5,26 @@ use fantasy_util::bit::usize::BitUtil;
 use crate::cpu::arm_op_table::ArmOpType;
 use crate::cpu::reg::Register;
 
-struct DataProcess {}
+pub struct DataProcess {}
 
 impl DataProcess {
-    pub fn execute(op: u32, reg: &mut Register, op_type: ArmOpType) {
-        let opcode_type: OpcodeType = (op.extract(21, 4) as u8).into();
-        let s = op.get_bit_bool(20);
-
-        let operand1 = reg.reg_val(rn);
-        // resutls ( 0:result value   1:flag_C   2:flag_V )
-        let results: (u32, bool, bool) = match opcode_type {
-            OpcodeType::AND => {}
-            OpcodeType::EOR => {}
-            OpcodeType::SUB => {}
-            OpcodeType::RSB => {}
-            OpcodeType::ADD => {}
-            OpcodeType::ADC => {}
-            OpcodeType::SBC => {}
-            OpcodeType::RSC => {}
-
-            OpcodeType::TST => {}
-            OpcodeType::TEQ => {}
-            OpcodeType::CMP => {}
-            OpcodeType::CMN => {}
-
-            OpcodeType::ORR => {}
-            OpcodeType::MOV => {}
-            OpcodeType::BIC => {}
-            OpcodeType::MVN => {}
-        };
-        if s { // If S bit is '1' , set condition codes
-            if rd != 15 {
-                let new_n = (results.0 as i32) < 0;
-                // TODO flag_c,flag_v
-                reg.cpsr.set_flag_nzcv(new_n, results.0 == 0, results.1, results.2);
-            } else {
-                reg.cpsr.set_val(reg.spsr())
-                // self.reg[reg::CPSR] = self.reg[reg::SPSR];
-                // self.reg.update_bank();
-            }
-        } else if !s && rd == 15 {
-            reg.set_reg(rd, results.0)
-        }
-    }
-
-    fn add(set_flag: bool, op: u32, reg: &mut Register) {
+    pub fn add(set_flag: bool, op: u32, reg: &mut Register) {
         let (operand1, rd) = base(op, reg);
     }
 
-    fn teq(op: u32, reg: &mut Register) {
+    pub fn teq(op: u32, reg: &mut Register) {
         let (operand1, rd) = base(op, reg);
     }
 
-    fn tst(op: u32, reg: &mut Register) {
+    pub fn tst(op: u32, reg: &mut Register) {
         let (operand1, rd) = base(op, reg);
     }
 
-    fn cmp(op: u32, reg: &mut Register) {
+    pub fn cmp(op: u32, reg: &mut Register) {
         let (operand1, rd) = base(op, reg);
     }
 
-    fn cmn(op: u32, reg: &mut Register) {
+    pub fn cmn(op: u32, reg: &mut Register) {
         let (operand1, rd) = base(op, reg);
     }
 
