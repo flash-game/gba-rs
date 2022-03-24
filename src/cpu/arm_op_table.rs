@@ -1,377 +1,360 @@
-use crate::cpu::arm_op_table::ArmOpType::{ADC______, ADCS_____, ADD______, ADDS_____, AND______, ANDS_____, B________, BIC______, BICS_____, BKPT_____, BL_______, BLX______, BX_______, CDP______, CLZ______, CMNS_____, CMPS_____, EOR______, EORS_____, LDC______, LDMDA____, LDMDB____, LDMIA____, LDMIB____, LDR______, LDRB_____, LDRBT____, LDRD_____, LDRH_____, LDRSB____, LDRSH____, LDRT_____, MCR______, MLA______, MLAS_____, MOV______, MOVS_____, MRC______, MRS______, MSR______, MUL______, MULS_____, MVN______, MVNS_____, ORR______, ORRS_____, QADD_____, QDADD____, QDSUB____, QSUB_____, RSB______, RSBS_____, RSC______, RSCS_____, SBC______, SBCS_____, SMLABB___, SMLABT___, SMLAL____, SMLALBB__, SMLALBT__, SMLALS___, SMLALTB__, SMLALTT__, SMLATB___, SMLATT___, SMLAWB___, SMLAWT___, SMULBB___, SMULBT___, SMULL____, SMULLS___, SMULTB___, SMULTT___, SMULWB___, SMULWT___, STC______, STMDA____, STMDB____, STMIA____, STMIB____, STR______, STRB_____, STRBT____, STRD_____, STRH_____, STRT_____, SUB______, SUBS_____, SWI______, SWP______, SWPB_____, TEQS_____, TSTS_____, UMLAL____, UMLALS___, UMULL____, UMULLS___, Undefined};
+use crate::cpu::arm_op_table::ArmOpType::{
+    Undef__, ADCS___, ADC____, ADDS___, ADD____, ANDS___, AND____, BICS___, BIC____, BL_____, BX_____, B______, CDP____, CMNS___,
+    CMPS___, EORS___, EOR____, LDC____, LDMDA__, LDMDB__, LDMIA__, LDMIB__, LDRBT__, LDRB___, LDRH___, LDRSB__, LDRSH__, LDRT___,
+    LDR____, MCR____, MLAS___, MLA____, MOVS___, MOV____, MRC____, MRS____, MSR____, MULS___, MUL____, MVNS___, MVN____, ORRS___,
+    ORR____, RSBS___, RSB____, RSCS___, RSC____, SBCS___, SBC____, SMLALS_, SMLAL__, SMULLS_, SMULL__, STC____, STMDA__, STMDB__,
+    STMIA__, STMIB__, STRBT__, STRB___, STRH___, STRT___, STR____, SUBS___, SUB____, SWI____, SWPB___, SWP____, TEQS___, TSTS___,
+    UMLALS_, UMLAL__, UMULLS_, UMULL__,
+};
 
 pub fn select_instruct() {}
 
 #[derive(Copy, Clone)]
 pub enum ArmOpType {
-    BLX______,
-    SMLALBT__,
-    STMDA____,
-    STC______,
-    MCR______,
-    QDSUB____,
-    UMLAL____,
-    SMULLS___,
-    RSC______,
-    ADD______,
-    MRS______,
-    SMLATB___,
-    SMULTT___,
-    STMDB____,
+    STMDA__,
+    STC____,
+    MCR____,
+    UMLAL__,
+    SMULLS_,
+    RSC____,
+    ADD____,
+    MRS____,
+    STMDB__,
 
-    STMIB____,
-    ADC______,
-    B________,
-    SMLAWT___,
+    STMIB__,
+    ADC____,
+    B______,
 
-    STR______,
-    STRT_____,
-    STRB_____,
-    STRBT____,
-    STRH_____,
-    STRD_____,
+    STR____,
+    STRT___,
+    STRB___,
+    STRBT__,
+    STRH___,
 
-    LDR______,
-    LDRSB____,
-    LDRB_____,
-    LDRD_____,
-    LDRBT____,
-    LDRSH____,
-    LDRH_____,
-    LDRT_____,
+    LDR____,
+    LDRSB__,
+    LDRB___,
+    LDRBT__,
+    LDRSH__,
+    LDRH___,
+    LDRT___,
 
-    ADCS_____,
-    BICS_____,
-    LDMIA____,
-    MRC______,
-    RSBS_____,
-    MULS_____,
-    AND______,
-    MLAS_____,
-    MUL______,
-    SUBS_____,
-    QDADD____,
-    SMULL____,
-    ANDS_____,
-    SBC______,
-    SUB______,
-    SMLALS___,
-    BX_______,
-    MOVS_____,
-    MLA______,
-    EORS_____,
-    STMIA____,
-    SMLABB___,
-    LDMDA____,
-    RSB______,
-    TSTS_____,
-    MVN______,
-    QSUB_____,
-    QADD_____,
-    RSCS_____,
-    UMLALS___,
-    EOR______,
-    SMLAL____,
-    SMLATT___,
-    SBCS_____,
-    SMLAWB___,
-    MVNS_____,
-    CDP______,
-    MSR______,
-    SMLALTB__,
-    SMULWB___,
-    CLZ______,
-    LDMDB____,
-    SMULWT___,
-    ADDS_____,
-    ORRS_____,
-    SWI______,
-    BIC______,
-    MOV______,
-    CMPS_____,
-    BKPT_____,
-    SMLABT___,
-    UMULLS___,
-    LDC______,
-    SMULTB___,
-    SWP______,
-    SMULBB___,
-    SWPB_____,
-    UMULL____,
-    SMLALTT__,
-    SMULBT___,
-    CMNS_____,
-    SMLALBB__,
-    ORR______,
-    BL_______,
-    LDMIB____,
-    TEQS_____,
-    Undefined,
+    ADCS___,
+    BICS___,
+    LDMIA__,
+    MRC____,
+    RSBS___,
+    MULS___,
+    AND____,
+    MLAS___,
+    MUL____,
+    SUBS___,
+    SMULL__,
+    ANDS___,
+    SBC____,
+    SUB____,
+    SMLALS_,
+    BX_____,
+    MOVS___,
+    MLA____,
+    EORS___,
+    STMIA__,
+    LDMDA__,
+    RSB____,
+    TSTS___,
+    MVN____,
+    RSCS___,
+    UMLALS_,
+    EOR____,
+    SMLAL__,
+    SBCS___,
+    MVNS___,
+    CDP____,
+    MSR____,
+    LDMDB__,
+    ADDS___,
+    ORRS___,
+    SWI____,
+    BIC____,
+    MOV____,
+    CMPS___,
+    UMULLS_,
+    LDC____,
+    SWP____,
+    SWPB___,
+    UMULL__,
+    CMNS___,
+    ORR____,
+    BL_____,
+    LDMIB__,
+    TEQS___,
+    Undef__,
 }
 
+#[rustfmt::skip]
 pub const TABLE: [[ArmOpType; 16]; 256] = [
-    [AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, MUL______, AND______, STRH_____, AND______, LDRD_____, AND______, STRD_____],  // 0
-    [ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, MULS_____, ANDS_____, LDRH_____, ANDS_____, LDRSB____, ANDS_____, LDRSH____],  // 1
-    [EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, MLA______, EOR______, STRH_____, EOR______, LDRD_____, EOR______, STRD_____],  // 2
-    [EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, MLAS_____, EORS_____, LDRH_____, EORS_____, LDRSB____, EORS_____, LDRSH____],  // 3
-    [SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, Undefined, SUB______, STRH_____, SUB______, LDRD_____, SUB______, STRD_____],  // 4
-    [SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, Undefined, SUBS_____, LDRH_____, SUBS_____, LDRSB____, SUBS_____, LDRSH____],  // 5
-    [RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, Undefined, RSB______, STRH_____, RSB______, LDRD_____, RSB______, STRD_____],  // 6
-    [RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, Undefined, RSBS_____, LDRH_____, RSBS_____, LDRSB____, RSBS_____, LDRSH____],  // 7
-    [ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, UMULL____, ADD______, STRH_____, ADD______, LDRD_____, ADD______, STRD_____],  // 8
-    [ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, UMULLS___, ADDS_____, LDRH_____, ADDS_____, LDRSB____, ADDS_____, LDRSH____],  // 9
-    [ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, UMLAL____, ADC______, STRH_____, ADC______, LDRD_____, ADC______, STRD_____],  // 10
-    [ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, UMLALS___, ADCS_____, LDRH_____, ADCS_____, LDRSB____, ADCS_____, LDRSH____],  // 11
-    [SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SMULL____, SBC______, STRH_____, SBC______, LDRD_____, SBC______, STRD_____],  // 12
-    [SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SMULLS___, SBCS_____, LDRH_____, SBCS_____, LDRSB____, SBCS_____, LDRSH____],  // 13
-    [RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, SMLAL____, RSC______, STRH_____, RSC______, LDRD_____, RSC______, STRD_____],  // 14
-    [RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, SMLALS___, RSCS_____, LDRH_____, RSCS_____, LDRSB____, RSCS_____, LDRSH____],  // 15
-    [MRS______, Undefined, Undefined, Undefined, Undefined, QADD_____, Undefined, Undefined, SMLABB___, SWP______, SMLATB___, STRH_____, SMLABT___, LDRD_____, SMLATT___, STRD_____],  // 16
-    [TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, Undefined, TSTS_____, LDRH_____, TSTS_____, LDRSB____, TSTS_____, LDRSH____],  // 17
-    [MSR______, BX_______, Undefined, BLX______, Undefined, QSUB_____, Undefined, BKPT_____, SMLAWB___, Undefined, SMULWB___, STRH_____, SMLAWT___, LDRD_____, SMULWT___, STRD_____],  // 18
-    [TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, Undefined, TEQS_____, LDRH_____, TEQS_____, LDRSB____, TEQS_____, LDRSH____],  // 19
-    [MRS______, Undefined, Undefined, Undefined, Undefined, QDADD____, Undefined, Undefined, SMLALBB__, SWPB_____, SMLALTB__, STRH_____, SMLALBT__, LDRD_____, SMLALTT__, STRD_____],  // 20
-    [CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, Undefined, CMPS_____, LDRH_____, CMPS_____, LDRSB____, CMPS_____, LDRSH____],  // 21
-    [MSR______, CLZ______, Undefined, Undefined, Undefined, QDSUB____, Undefined, Undefined, SMULBB___, Undefined, SMULTB___, STRH_____, SMULBT___, LDRD_____, SMULTT___, STRD_____],  // 22
-    [CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, Undefined, CMNS_____, LDRH_____, CMNS_____, LDRSB____, CMNS_____, LDRSH____],  // 23
-    [ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, Undefined, ORR______, STRH_____, ORR______, LDRD_____, ORR______, STRD_____],  // 24
-    [ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, Undefined, ORRS_____, LDRH_____, ORRS_____, LDRSB____, ORRS_____, LDRSH____],  // 25
-    [MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, Undefined, MOV______, STRH_____, MOV______, LDRD_____, MOV______, STRD_____],  // 26
-    [MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, Undefined, MOVS_____, LDRH_____, MOVS_____, LDRSB____, MOVS_____, LDRSH____],  // 27
-    [BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, Undefined, BIC______, STRH_____, BIC______, LDRD_____, BIC______, STRD_____],  // 28
-    [BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, Undefined, BICS_____, LDRH_____, BICS_____, LDRSB____, BICS_____, LDRSH____],  // 29
-    [MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, Undefined, MVN______, STRH_____, MVN______, LDRD_____, MVN______, STRD_____],  // 30
-    [MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, Undefined, MVNS_____, LDRH_____, MVNS_____, LDRSB____, MVNS_____, LDRSH____],  // 31
+    [AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, MUL____, AND____, STRH___, AND____, Undef__, AND____, Undef__],  // 0
+    [ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, MULS___, ANDS___, LDRH___, ANDS___, LDRSB__, ANDS___, LDRSH__],  // 1
+    [EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, MLA____, EOR____, STRH___, EOR____, Undef__, EOR____, Undef__],  // 2
+    [EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, MLAS___, EORS___, LDRH___, EORS___, LDRSB__, EORS___, LDRSH__],  // 3
+    [SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, Undef__, SUB____, STRH___, SUB____, Undef__, SUB____, Undef__],  // 4
+    [SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, Undef__, SUBS___, LDRH___, SUBS___, LDRSB__, SUBS___, LDRSH__],  // 5
+    [RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, Undef__, RSB____, STRH___, RSB____, Undef__, RSB____, Undef__],  // 6
+    [RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, Undef__, RSBS___, LDRH___, RSBS___, LDRSB__, RSBS___, LDRSH__],  // 7
+    [ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, UMULL__, ADD____, STRH___, ADD____, Undef__, ADD____, Undef__],  // 8
+    [ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, UMULLS_, ADDS___, LDRH___, ADDS___, LDRSB__, ADDS___, LDRSH__],  // 9
+    [ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, UMLAL__, ADC____, STRH___, ADC____, Undef__, ADC____, Undef__],  // 10
+    [ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, UMLALS_, ADCS___, LDRH___, ADCS___, LDRSB__, ADCS___, LDRSH__],  // 11
+    [SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SMULL__, SBC____, STRH___, SBC____, Undef__, SBC____, Undef__],  // 12
+    [SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SMULLS_, SBCS___, LDRH___, SBCS___, LDRSB__, SBCS___, LDRSH__],  // 13
+    [RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, SMLAL__, RSC____, STRH___, RSC____, Undef__, RSC____, Undef__],  // 14
+    [RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, SMLALS_, RSCS___, LDRH___, RSCS___, LDRSB__, RSCS___, LDRSH__],  // 15
+    [MRS____, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, SWP____, Undef__, STRH___, Undef__, Undef__, Undef__, Undef__],  // 16
+    [TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, Undef__, TSTS___, LDRH___, TSTS___, LDRSB__, TSTS___, LDRSH__],  // 17
+    [MSR____, BX_____, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, STRH___, Undef__, Undef__, Undef__, Undef__],  // 18
+    [TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, Undef__, TEQS___, LDRH___, TEQS___, LDRSB__, TEQS___, LDRSH__],  // 19
+    [MRS____, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, SWPB___, Undef__, STRH___, Undef__, Undef__, Undef__, Undef__],  // 20
+    [CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, Undef__, CMPS___, LDRH___, CMPS___, LDRSB__, CMPS___, LDRSH__],  // 21
+    [MSR____, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, STRH___, Undef__, Undef__, Undef__, Undef__],  // 22
+    [CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, Undef__, CMNS___, LDRH___, CMNS___, LDRSB__, CMNS___, LDRSH__],  // 23
+    [ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, Undef__, ORR____, STRH___, ORR____, Undef__, ORR____, Undef__],  // 24
+    [ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, Undef__, ORRS___, LDRH___, ORRS___, LDRSB__, ORRS___, LDRSH__],  // 25
+    [MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, Undef__, MOV____, STRH___, MOV____, Undef__, MOV____, Undef__],  // 26
+    [MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, Undef__, MOVS___, LDRH___, MOVS___, LDRSB__, MOVS___, LDRSH__],  // 27
+    [BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, Undef__, BIC____, STRH___, BIC____, Undef__, BIC____, Undef__],  // 28
+    [BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, Undef__, BICS___, LDRH___, BICS___, LDRSB__, BICS___, LDRSH__],  // 29
+    [MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, Undef__, MVN____, STRH___, MVN____, Undef__, MVN____, Undef__],  // 30
+    [MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, Undef__, MVNS___, LDRH___, MVNS___, LDRSB__, MVNS___, LDRSH__],  // 31
 
-    [AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______, AND______],  // 32
-    [ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____, ANDS_____],  // 33
-    [EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______, EOR______],  // 34
-    [EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____, EORS_____],  // 35
-    [SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______, SUB______],  // 36
-    [SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____, SUBS_____],  // 37
-    [RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______, RSB______],  // 38
-    [RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____, RSBS_____],  // 39
-    [ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______, ADD______],  // 40
-    [ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____, ADDS_____],  // 41
-    [ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______, ADC______],  // 42
-    [ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____, ADCS_____],  // 43
-    [SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______, SBC______],  // 44
-    [SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____, SBCS_____],  // 45
-    [RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______, RSC______],  // 46
-    [RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____, RSCS_____],  // 47
-    [Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined],  // 48
-    [TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____, TSTS_____],  // 49
-    [MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______],  // 50
-    [TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____, TEQS_____],  // 51
-    [Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined, Undefined],  // 52
-    [CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____, CMPS_____],  // 53
-    [MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______, MSR______],  // 54
-    [CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____, CMNS_____],  // 55
-    [ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______, ORR______],  // 56
-    [ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____, ORRS_____],  // 57
-    [MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______, MOV______],  // 58
-    [MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____, MOVS_____],  // 59
-    [BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______, BIC______],  // 60
-    [BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____, BICS_____],  // 61
-    [MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______, MVN______],  // 62
-    [MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____, MVNS_____],  // 63
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 64
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 65
-    [STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____],  // 66
-    [LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____],  // 67
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 68
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 69
-    [STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____],  // 70
-    [LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____],  // 71
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 72
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 73
-    [STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____, STRT_____],  // 74
-    [LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____, LDRT_____],  // 75
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 76
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 77
-    [STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____, STRBT____],  // 78
-    [LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____, LDRBT____],  // 79
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 80
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 81
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 82
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 83
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 84
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 85
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 86
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 87
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 88
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 89
-    [STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______, STR______],  // 90
-    [LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______, LDR______],  // 91
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 92
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 93
-    [STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____, STRB_____],  // 94
-    [LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____, LDRB_____],  // 95
+    [AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____],  // 32
+    [ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___],  // 33
+    [EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____],  // 34
+    [EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___, EORS___],  // 35
+    [SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____, SUB____],  // 36
+    [SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___, SUBS___],  // 37
+    [RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____, RSB____],  // 38
+    [RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___, RSBS___],  // 39
+    [ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____, ADD____],  // 40
+    [ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___, ADDS___],  // 41
+    [ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____, ADC____],  // 42
+    [ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___, ADCS___],  // 43
+    [SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____, SBC____],  // 44
+    [SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___, SBCS___],  // 45
+    [RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____, RSC____],  // 46
+    [RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___, RSCS___],  // 47
+    [Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__],  // 48
+    [TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___, TSTS___],  // 49
+    [MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____],  // 50
+    [TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___, TEQS___],  // 51
+    [Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__, Undef__],  // 52
+    [CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___, CMPS___],  // 53
+    [MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____, MSR____],  // 54
+    [CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___, CMNS___],  // 55
+    [ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____, ORR____],  // 56
+    [ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___, ORRS___],  // 57
+    [MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____, MOV____],  // 58
+    [MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___, MOVS___],  // 59
+    [BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____, BIC____],  // 60
+    [BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___, BICS___],  // 61
+    [MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____, MVN____],  // 62
+    [MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___, MVNS___],  // 63
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 64
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 65
+    [STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___],  // 66
+    [LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___],  // 67
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 68
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 69
+    [STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__],  // 70
+    [LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__],  // 71
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 72
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 73
+    [STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___, STRT___],  // 74
+    [LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___, LDRT___],  // 75
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 76
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 77
+    [STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__, STRBT__],  // 78
+    [LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__, LDRBT__],  // 79
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 80
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 81
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 82
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 83
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 84
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 85
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 86
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 87
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 88
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 89
+    [STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____, STR____],  // 90
+    [LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____, LDR____],  // 91
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 92
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 93
+    [STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___, STRB___],  // 94
+    [LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___, LDRB___],  // 95
 
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 96
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 97
-    [STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined],  // 98
-    [LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined],  // 99
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 100
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 101
-    [STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined],  // 102
-    [LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined],  // 103
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 104
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 105
-    [STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined, STRT_____, Undefined],  // 106
-    [LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined, LDRT_____, Undefined],  // 107
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 108
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 109
-    [STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined, STRBT____, Undefined],  // 110
-    [LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined, LDRBT____, Undefined],  // 111
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 112
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 113
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 114
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 115
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 116
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 117
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 118
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 119
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 120
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 121
-    [STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined, STR______, Undefined],  // 122
-    [LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined, LDR______, Undefined],  // 123
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 124
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 125
-    [STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined, STRB_____, Undefined],  // 126
-    [LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined, LDRB_____, Undefined],  // 127
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 96
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 97
+    [STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__],  // 98
+    [LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__],  // 99
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 100
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 101
+    [STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__],  // 102
+    [LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__],  // 103
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 104
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 105
+    [STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__, STRT___, Undef__],  // 106
+    [LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__, LDRT___, Undef__],  // 107
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 108
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 109
+    [STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__, STRBT__, Undef__],  // 110
+    [LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__, LDRBT__, Undef__],  // 111
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 112
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 113
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 114
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 115
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 116
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 117
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 118
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 119
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 120
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 121
+    [STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__, STR____, Undef__],  // 122
+    [LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__, LDR____, Undef__],  // 123
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 124
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 125
+    [STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__, STRB___, Undef__],  // 126
+    [LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__, LDRB___, Undef__],  // 127
 
-    [STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____],  // 128
-    [LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____],  // 129
-    [STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____],  // 130
-    [LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____],  // 131
-    [STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____],  // 132
-    [LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____],  // 133
-    [STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____, STMDA____],  // 134
-    [LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____, LDMDA____],  // 135
-    [STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____],  // 136
-    [LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____],  // 137
-    [STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____],  // 138
-    [LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____],  // 139
-    [STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____],  // 140
-    [LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____],  // 141
-    [STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____, STMIA____],  // 142
-    [LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____, LDMIA____],  // 143
-    [STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____],  // 144
-    [LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____],  // 145
-    [STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____],  // 146
-    [LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____],  // 147
-    [STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____],  // 148
-    [LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____],  // 149
-    [STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____, STMDB____],  // 150
-    [LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____, LDMDB____],  // 151
-    [STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____],  // 152
-    [LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____],  // 153
-    [STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____],  // 154
-    [LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____],  // 155
-    [STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____],  // 156
-    [LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____],  // 157
-    [STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____, STMIB____],  // 158
-    [LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____, LDMIB____],  // 159
+    [STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__],  // 128
+    [LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__],  // 129
+    [STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__],  // 130
+    [LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__],  // 131
+    [STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__],  // 132
+    [LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__],  // 133
+    [STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__, STMDA__],  // 134
+    [LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__, LDMDA__],  // 135
+    [STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__],  // 136
+    [LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__],  // 137
+    [STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__],  // 138
+    [LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__],  // 139
+    [STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__],  // 140
+    [LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__],  // 141
+    [STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__, STMIA__],  // 142
+    [LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__, LDMIA__],  // 143
+    [STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__],  // 144
+    [LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__],  // 145
+    [STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__],  // 146
+    [LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__],  // 147
+    [STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__],  // 148
+    [LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__],  // 149
+    [STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__, STMDB__],  // 150
+    [LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__, LDMDB__],  // 151
+    [STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__],  // 152
+    [LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__],  // 153
+    [STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__],  // 154
+    [LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__],  // 155
+    [STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__],  // 156
+    [LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__],  // 157
+    [STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__, STMIB__],  // 158
+    [LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__, LDMIB__],  // 159
 
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 160
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 161
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 162
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 163
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 164
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 165
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 166
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 167
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 168
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 169
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 170
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 171
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 172
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 173
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 174
-    [B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________, B________],  // 175
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 160
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 161
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 162
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 163
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 164
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 165
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 166
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 167
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 168
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 169
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 170
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 171
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 172
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 173
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 174
+    [B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______, B______],  // 175
 
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 176
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 177
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 178
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 179
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 180
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 181
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 182
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 183
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 184
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 185
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 186
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 187
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 188
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 189
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 190
-    [BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______, BL_______],  // 191
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 176
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 177
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 178
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 179
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 180
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 181
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 182
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 183
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 184
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 185
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 186
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 187
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 188
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 189
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 190
+    [BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____, BL_____],  // 191
 
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 192
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 193
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 194
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 195
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 196
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 197
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 198
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 199
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 200
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 201
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 202
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 203
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 204
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 205
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 206
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 207
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 208
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 209
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 210
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 211
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 212
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 213
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 214
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 215
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 216
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 217
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 218
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 219
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 220
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 221
-    [STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______, STC______],  // 222
-    [LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______, LDC______],  // 223
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 192
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 193
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 194
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 195
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 196
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 197
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 198
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 199
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 200
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 201
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 202
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 203
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 204
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 205
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 206
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 207
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 208
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 209
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 210
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 211
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 212
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 213
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 214
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 215
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 216
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 217
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 218
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 219
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 220
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 221
+    [STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____, STC____],  // 222
+    [LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____, LDC____],  // 223
 
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 224
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 225
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 226
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 227
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 228
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 229
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 230
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 231
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 232
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 233
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 234
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 235
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 236
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 237
-    [CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______, CDP______, MCR______],  // 238
-    [CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______, CDP______, MRC______],  // 239
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 224
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 225
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 226
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 227
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 228
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 229
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 230
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 231
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 232
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 233
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 234
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 235
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 236
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 237
+    [CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____, CDP____, MCR____],  // 238
+    [CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____, CDP____, MRC____],  // 239
 
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 240
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 241
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 242
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 243
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 244
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 245
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 246
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 247
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 248
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 249
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 250
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 251
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 252
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 253
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 254
-    [SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______, SWI______],  // 255
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 240
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 241
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 242
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 243
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 244
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 245
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 246
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 247
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 248
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 249
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 250
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 251
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 252
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 253
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 254
+    [SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____, SWI____],  // 255
 ];

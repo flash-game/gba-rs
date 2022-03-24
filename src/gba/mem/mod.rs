@@ -1,5 +1,6 @@
-mod mem;
+use crate::cpu::mem::Memory;
 
+mod mem;
 
 /// 只读地址
 struct RoAddr {
@@ -9,10 +10,7 @@ struct RoAddr {
 
 impl RoAddr {
     fn init(init: Vec<u8>, offset: u32) -> RoAddr {
-        RoAddr {
-            data: init,
-            offset,
-        }
+        RoAddr { data: init, offset }
     }
 }
 

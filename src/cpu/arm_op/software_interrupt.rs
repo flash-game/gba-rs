@@ -1,4 +1,4 @@
-use crate::cpu::reg::{Register, OpType, Mode};
+use crate::cpu::reg::{Mode, OpType, Register};
 
 pub struct SoftwareInterrupt {}
 

@@ -34,7 +34,6 @@ pub struct Register {
     spsr_und: u32,
     spsr_irq: u32,
     spsr_fiq: u32,
-
 }
 
 impl Register {
@@ -45,7 +44,7 @@ impl Register {
 
     pub fn set_pc(&mut self, pc: u32) {
         if (pc & 0xFFFF_FFFC) != 0x0000_0000 {
-            panic!(format!("Error PC value 0x{:X}", pc));
+            panic!("Error PC value 0x{:X}", pc);
         }
         self.r15 = pc
     }
@@ -102,13 +101,16 @@ impl Register {
     pub fn set_reg(&mut self, rn: u8, val: u32) {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize] = val,
-            0x8..=0xC => if self.cpsr.mode == Mode::FastInterrupt {
-                self.high_fiq_reg[(rn - 8) as usize] = val
-            } else { self.high_common_reg[(rn - 8) as usize] = val }
+            0x8..=0xC => match self.cpsr.mode {
+                Mode::FastInterrupt => self.high_fiq_reg[(rn - 8) as usize] = val,
+                _ => self.high_common_reg[(rn - 8) as usize] = val,
+            },
             0xD => self.set_sp(val),
             0xE => self.set_lr(val),
             0xF => self.set_pc(val),
-            _ => { panic!(format!("Error register value 0x{:X}", val)); }
+            _ => {
+                panic!("Error register value 0x{:X}", val);
+            }
         }
     }
 
@@ -116,19 +118,21 @@ impl Register {
     pub fn reg_val(&mut self, rn: u8) -> u32 {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize],
-            0x8..=0xC => if self.cpsr.mode == Mode::FastInterrupt {
-                self.high_fiq_reg[(rn - 8) as usize]
-            } else { self.high_common_reg[(rn - 8) as usize] }
+            0x8..=0xC => {
+                if self.cpsr.mode == Mode::FastInterrupt {
+                    self.high_fiq_reg[(rn - 8) as usize]
+                } else {
+                    self.high_common_reg[(rn - 8) as usize]
+                }
+            }
             0xD => self.get_sp(),
             0xE => self.get_lr(),
             0xF => self.get_pc(),
-            n => unreachable!()
+            _ => unreachable!(),
         }
     }
 
-
-//-----------------------------------Control---------------------------------//
-
+    //-----------------------------------Control---------------------------------//
 
     pub fn spsr(&self) -> u32 {
         match self.cpsr.mode() {
@@ -137,7 +141,7 @@ impl Register {
             Mode::Supervisor => self.spsr_svc,
             Mode::Abort => self.spsr_abt,
             Mode::Undefined => self.spsr_und,
-            n => panic!(format!("Unsupport spsr mode {:?}", n)),
+            n => panic!("Unsupport spsr mode {:?}", n),
         }
     }
 
@@ -152,8 +156,7 @@ impl Register {
         };
     }
 
-//-----------------------------------Control---------------------------------//
-
+    //-----------------------------------Control---------------------------------//
 
     pub fn new() -> Self {
         Self {
@@ -213,7 +216,7 @@ impl From<u8> for Mode {
             0b10111 => Mode::Abort,
             0b11011 => Mode::Undefined,
             0b11111 => Mode::System,
-            n => panic!(format!("unknown mode 0x{:X}", n))
+            n => panic!("unknown mode 0x{:X}", n),
         }
     }
 }
@@ -227,7 +230,9 @@ pub struct CPSR {
 }
 
 impl CPSR {
-    pub fn value(&self) -> u32 { self.cpsr_val }
+    pub fn value(&self) -> u32 {
+        self.cpsr_val
+    }
 
     pub fn set_val(&mut self, cspr_val: u32) {
         self.cpsr_val = cspr_val;
@@ -236,35 +241,59 @@ impl CPSR {
     }
 
     /// negative 负
-    pub fn flag_n(&self) -> bool { self.cpsr_val & 0x8000_0000 != 0 }
+    pub fn flag_n(&self) -> bool {
+        self.cpsr_val & 0x8000_0000 != 0
+    }
 
     /// ZERO
-    pub fn flag_z(&self) -> bool { self.cpsr_val & 0x4000_0000 != 0 }
+    pub fn flag_z(&self) -> bool {
+        self.cpsr_val & 0x4000_0000 != 0
+    }
 
     /// Carry 进位
-    pub fn flag_c(&self) -> bool { self.cpsr_val & 0x2000_0000 != 0 }
+    pub fn flag_c(&self) -> bool {
+        self.cpsr_val & 0x2000_0000 != 0
+    }
 
     /// Overflow 溢出位
-    pub fn flag_v(&self) -> bool { self.cpsr_val & 0x1000_0000 != 0 }
+    pub fn flag_v(&self) -> bool {
+        self.cpsr_val & 0x1000_0000 != 0
+    }
 
     /// negative 负
     pub fn set_flag_n(&mut self, r: bool) {
-        self.cpsr_val = if r { self.cpsr_val | 0x8000_0000 } else { self.cpsr_val & 0x7FFF_FFFF }
+        self.cpsr_val = if r {
+            self.cpsr_val | 0x8000_0000
+        } else {
+            self.cpsr_val & 0x7FFF_FFFF
+        }
     }
 
     /// ZERO
     pub fn set_flag_z(&mut self, r: bool) {
-        self.cpsr_val = if r { self.cpsr_val | 0x4000_0000 } else { self.cpsr_val & 0xBFFF_FFFF }
+        self.cpsr_val = if r {
+            self.cpsr_val | 0x4000_0000
+        } else {
+            self.cpsr_val & 0xBFFF_FFFF
+        }
     }
 
     /// Carry 进位
     pub fn set_flag_c(&mut self, r: bool) {
-        self.cpsr_val = if r { self.cpsr_val | 0x2000_0000 } else { self.cpsr_val & 0xDFFFFFFF }
+        self.cpsr_val = if r {
+            self.cpsr_val | 0x2000_0000
+        } else {
+            self.cpsr_val & 0xDFFFFFFF
+        }
     }
 
     /// Overflow 溢出位
     pub fn set_flag_v(&mut self, r: bool) {
-        self.cpsr_val = if r { self.cpsr_val | 0x1000_0000 } else { self.cpsr_val & 0xEFFF_FFFF }
+        self.cpsr_val = if r {
+            self.cpsr_val | 0x1000_0000
+        } else {
+            self.cpsr_val & 0xEFFF_FFFF
+        }
     }
 
     /// Set CSPR Flag value , include flag_n/flag_z/flag_c/flag_v
@@ -275,16 +304,28 @@ impl CPSR {
         self.set_flag_v(v);
     }
 
-    pub fn irq_disable(&self) -> bool { self.cpsr_val & 0x0000_0080 != 0 }
-
-    pub fn set_irq_disable(&mut self, disable: bool) {
-        self.cpsr_val = if disable { self.cpsr_val | 0x80 } else { self.cpsr_val & 0xFFFFFF7F }
+    pub fn irq_disable(&self) -> bool {
+        self.cpsr_val & 0x0000_0080 != 0
     }
 
-    pub fn fiq_disable(&self) -> bool { self.cpsr_val & 0x0000_0040 != 0 }
+    pub fn set_irq_disable(&mut self, disable: bool) {
+        self.cpsr_val = if disable {
+            self.cpsr_val | 0x80
+        } else {
+            self.cpsr_val & 0xFFFFFF7F
+        }
+    }
+
+    pub fn fiq_disable(&self) -> bool {
+        self.cpsr_val & 0x0000_0040 != 0
+    }
 
     pub fn set_fiq_disable(&mut self, disable: bool) {
-        self.cpsr_val = if disable { self.cpsr_val | 0x40 } else { self.cpsr_val & 0xFFFFFFBF }
+        self.cpsr_val = if disable {
+            self.cpsr_val | 0x40
+        } else {
+            self.cpsr_val & 0xFFFFFFBF
+        }
     }
 
     /// Set the current operation status
@@ -295,7 +336,9 @@ impl CPSR {
         }
     }
 
-    pub fn mode(&self) -> &Mode { &self.mode }
+    pub fn mode(&self) -> &Mode {
+        &self.mode
+    }
 
     /// 设置当前处理器模式
     pub fn set_mode(&mut self, mode: Mode) {
@@ -314,10 +357,17 @@ impl CPSR {
 
     /// Get the current operation status
     pub fn op_status(&self) -> OpType {
-        if (self.cpsr_val & 0x20) != 0 { OpType::Thumb } else { OpType::ARM }
+        if (self.cpsr_val & 0x20) != 0 {
+            OpType::Thumb
+        } else {
+            OpType::ARM
+        }
     }
 
     pub fn new() -> Self {
-        Self { cpsr_val: 0, mode: Mode::User }
+        Self {
+            cpsr_val: 0,
+            mode: Mode::User,
+        }
     }
 }

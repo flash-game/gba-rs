@@ -1,13 +1,13 @@
 [package]
-name = "gba-rust"
+name = "gba-rs"
 version = "0.1.0"
 authors = ["jelipo <me@jelipo.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-minifb = "0.19.2"
+minifb = "0.20.0"
 fantasy-util = "0.1.8"
 
 [profile.release]

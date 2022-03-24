@@ -1,9 +1,6 @@
-mod arm_op_table;
-mod arm;
-mod arm_op_select;
 mod addrbus;
+mod arm;
+mod arm_op;
+mod arm_op_table;
 pub mod mem;
 mod reg;
-mod selector;
-mod arm_op;
-

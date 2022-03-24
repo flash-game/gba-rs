@@ -1,36 +1,38 @@
-use std::sync::{Arc, Mutex};
-
 use fantasy_util::bit::usize::BitUtil;
 
-use crate::cpu::arm_op_table::ArmOpType;
 use crate::cpu::reg::Register;
 
 pub struct DataProcess {}
 
 impl DataProcess {
-    pub fn add(set_flag: bool, op: u32, reg: &mut Register) {
-        let (operand1, rd) = base(op, reg);
+    pub fn add(_set_flag: bool, op: u32, reg: &mut Register) {
+        let (_operand1, _rd) = base(op, reg);
+        // TODO
     }
 
     pub fn teq(op: u32, reg: &mut Register) {
-        let (operand1, rd) = base(op, reg);
+        let (_operand1, _rd) = base(op, reg);
+        // TODO
     }
 
     pub fn tst(op: u32, reg: &mut Register) {
-        let (operand1, rd) = base(op, reg);
+        let (_operand1, _rd) = base(op, reg);
+        // TODO
     }
 
     pub fn cmp(op: u32, reg: &mut Register) {
-        let (operand1, rd) = base(op, reg);
+        let (_operand1, _rd) = base(op, reg);
+        // TODO
     }
 
     pub fn cmn(op: u32, reg: &mut Register) {
-        let (operand1, rd) = base(op, reg);
+        let (_operand1, _rd) = base(op, reg);
+        // TODO
     }
 
-
     fn base_logical(op: u32, reg: &mut Register) {
-        let operand2 = if op.get_bit_bool(25) { // 立即数
+        let _operand2 = if op.get_bit_bool(25) {
+            // 立即数
             let imm = op & 0b1111_1111;
             let rotate = op.extract(8, 4);
             imm.rotate_right(rotate * 2)
@@ -49,7 +51,7 @@ impl DataProcess {
                 0b01 => rm_val >> shift_amount,
                 0b10 => ((rm_val as i32) >> shift_amount) as u32,
                 0b11 => rm_val.rotate_right(shift_amount),
-                _ => unreachable!()
+                _ => unreachable!(),
             }
         };
     }
@@ -61,7 +63,6 @@ fn base(op: u32, reg: &mut Register) -> (u32, u8) {
     let rd = op.extract(12, 4) as u8;
     (operand1, rd)
 }
-
 
 struct InternalBase {
     operand1: u32,
@@ -107,7 +108,7 @@ impl From<u8> for OpcodeType {
             0b1101 => OpcodeType::MOV,
             0b1110 => OpcodeType::BIC,
             0b1111 => OpcodeType::MVN,
-            n => panic!(format!("Unknow opcode 0x{:X}", n))
+            n => panic!("Unknow opcode 0x{:X}", n),
         }
     }
 }

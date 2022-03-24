@@ -1,5 +1,5 @@
 use crate::cpu::mem::Memory;
-    use crate::gba::mem::{RoAddr, RwAddr};
+use crate::gba::mem::{RoAddr, RwAddr};
 
 pub struct GbaAddressBus {
     // BIOS - System ROM         (16 KBytes)
@@ -50,7 +50,6 @@ const ROM_1_______END: u32 = 0x0BFFFFFF;
 const ROM_2_______END: u32 = 0x0DFFFFFF;
 const SRAM________END: u32 = 0x0E00FFFF;
 
-
 impl GbaAddressBus {
     pub fn init(bios: Vec<u8>, rom_0: Vec<u8>, rom_1: Vec<u8>, rom_2: Vec<u8>) -> GbaAddressBus {
         GbaAddressBus {
@@ -81,7 +80,7 @@ impl GbaAddressBus {
             ROM_1_______START..=ROM_1_______END => &self.rom_1,
             ROM_2_______START..=ROM_2_______END => &self.rom_2,
             SRAM________START..=SRAM________END => &self.sram,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -98,7 +97,7 @@ impl GbaAddressBus {
             ROM_1_______START..=ROM_1_______END => &mut self.rom_1,
             ROM_2_______START..=ROM_2_______END => &mut self.rom_2,
             SRAM________START..=SRAM________END => &mut self.sram,
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 }
@@ -115,7 +114,6 @@ impl Memory for GbaAddressBus {
     fn get_word(&self, addr: u32) -> u32 {
         self.select_mem(addr).get_word(addr)
     }
-
 
     fn set_byte(&mut self, addr: u32, val: u8) {
         self.select_mem_mut(addr).set_byte(addr, val)
