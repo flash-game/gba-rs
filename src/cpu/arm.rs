@@ -48,18 +48,23 @@ impl<'a> Arm7<'a> {
             ArmOpType::ADC____ => {}
             ArmOpType::B______ => Branch::execute(instruct, self.reg, old_pc, false),
             ArmOpType::BL_____ => Branch::execute(instruct, self.reg, old_pc, true),
+
             ArmOpType::STR____ => {}
             ArmOpType::STRT___ => {}
             ArmOpType::STRB___ => {}
             ArmOpType::STRBT__ => {}
+
             ArmOpType::STRH___ => {}
+
             ArmOpType::LDR____ => {}
-            ArmOpType::LDRSB__ => {}
             ArmOpType::LDRB___ => {}
             ArmOpType::LDRBT__ => {}
-            ArmOpType::LDRSH__ => {}
-            ArmOpType::LDRH___ => {}
             ArmOpType::LDRT___ => {}
+
+            ArmOpType::LDRH___ => {}
+            ArmOpType::LDRSB__ => {}
+            ArmOpType::LDRSH__ => {}
+
             ArmOpType::ADCS___ => {}
             ArmOpType::BICS___ => {}
             ArmOpType::LDMIA__ => {}

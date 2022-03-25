@@ -59,7 +59,14 @@ impl SingleDataTransfer {
 
         let addr = if !p { base } else { post_addr };
 
-        if !load {
+        if load {
+            let new_rd_val = if b {
+                addr_bus.get_byte(addr) as u32
+            } else {
+                addr_bus.get_word(addr)
+            };
+            reg.set_reg(rd, new_rd_val);
+        } else {
             // store
             let val = reg.reg_val(rd).wrapping_add(((rd == reg::PC) as u32) * 8);
             if b {
@@ -68,17 +75,73 @@ impl SingleDataTransfer {
             } else {
                 addr_bus.set_word(addr, val);
             };
-        } else {
-            let new_rd_val = if b {
-                addr_bus.get_byte(addr) as u32
-            } else {
-                addr_bus.get_word(addr)
-            };
-            reg.set_reg(rd, new_rd_val);
         };
 
         // post-indexing implies writeback.make sure we don't overwrite rd if it was a load
         if (!p || w) && (rd != rn || !load) {
+            reg.set_reg(rn, post_addr);
+        }
+    }
+
+    pub fn exe2(byte: bool, load: bool, inst: u32, reg: &mut Register, addr_bus: &mut dyn AddressBus) {
+        let offset_reg = inst.get_bit_bool(25);
+        let p = inst.get_bit(24);
+        let u = inst.get_bit(23);
+        let write_back = inst.get_bit_bool(21);
+
+        let rn = inst.extract(16, 4) as u8;
+        let rd = inst.extract(12, 4) as u8;
+
+        let offset = if offset_reg {
+            // We use the same logic here as for DataProc0
+            let shift = inst.extract(7, 5);
+            let shift_type = inst.extract(5, 2);
+
+            let rm = inst.extract(0, 4) as u8;
+
+            let valm = reg.reg_val(rm);
+
+            let (shifted, _) = if shift == 0 {
+                let cpsr_c = reg.cpsr.flag_c();
+                let c = cpsr.get_bit(cpsr::C);
+                arg_shift0(valm, shift_type, c)
+            } else {
+                arg_shift(valm, shift, shift_type)
+            };
+            shifted
+        } else {
+            inst.extract(0, 12)
+        };
+        let base = reg.reg_val(rn).wrapping_add(((rn == 15) as u32) * 4);
+        let post_addr = if u == 0 {
+            base.wrapping_sub(offset)
+        } else {
+            base.wrapping_add(offset)
+        };
+
+        let addr = if p == 0 { base } else { post_addr };
+
+        if !load {
+            // store
+            let val = reg.reg_val(rd).wrapping_add(((rd == 15) as u32) * 8);
+            if !byte {
+                // force alignment of the store
+                addr_bus.set_word(addr, val);
+            } else {
+                addr_bus.set_byte(addr, val as u8);
+            };
+        } else {
+            let a = if !byte {
+                addr_bus.get_word(addr)
+            } else {
+                addr_bus.get_byte(addr) as u32
+            };
+            reg.set_reg(rd, a)
+        };
+
+        // post-indexing implies writeback
+        // make sure w  e don't overwrite rd if it was a load
+        if (p == 0 || write_back) && (rd != rn || !load) {
             reg.set_reg(rn, post_addr);
         }
     }

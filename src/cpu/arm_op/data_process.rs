@@ -30,21 +30,21 @@ impl DataProcess {
         // TODO
     }
 
-    fn base_logical(op: u32, reg: &mut Register) {
-        let _operand2 = if op.get_bit_bool(25) {
+    fn base_logical(instruct: u32, reg: &mut Register) {
+        let _operand2 = if instruct.get_bit_bool(25) {
             // 立即数
-            let imm = op & 0b1111_1111;
-            let rotate = op.extract(8, 4);
+            let imm = instruct & 0b1111_1111;
+            let rotate = instruct.extract(8, 4);
             imm.rotate_right(rotate * 2)
         } else {
-            let rm = (op & 0b1111) as u8;
+            let rm = (instruct & 0b1111) as u8;
             let rm_val = reg.reg_val(rm);
-            let shift_type = op.extract(5, 2) as u8;
-            let shift_amount = if op.get_bit_bool(4) {
-                let rs = op.extract(8, 4) as u8;
+            let shift_type = instruct.extract(5, 2) as u8;
+            let shift_amount = if instruct.get_bit_bool(4) {
+                let rs = instruct.extract(8, 4) as u8;
                 reg.reg_val(rs) & 0b11111
             } else {
-                op.extract(7, 5)
+                instruct.extract(7, 5)
             };
             match shift_type {
                 0b00 => rm_val << shift_amount,
@@ -70,52 +70,5 @@ struct InternalBase {
     rd: u8,
 }
 
-enum OpcodeType {
-    AND,
-    EOR,
-    SUB,
-    RSB,
-    ADD,
-    ADC,
-    SBC,
-    RSC,
-    TST,
-    TEQ,
-    CMP,
-    CMN,
-    ORR,
-    MOV,
-    BIC,
-    MVN,
-}
 
-impl From<u8> for OpcodeType {
-    fn from(opcode: u8) -> Self {
-        match opcode {
-            0b0000 => OpcodeType::AND,
-            0b0001 => OpcodeType::EOR,
-            0b0010 => OpcodeType::SUB,
-            0b0011 => OpcodeType::RSB,
-            0b0100 => OpcodeType::ADD,
-            0b0101 => OpcodeType::ADC,
-            0b0110 => OpcodeType::SBC,
-            0b0111 => OpcodeType::RSC,
-            0b1000 => OpcodeType::TST,
-            0b1001 => OpcodeType::TEQ,
-            0b1010 => OpcodeType::CMP,
-            0b1011 => OpcodeType::CMN,
-            0b1100 => OpcodeType::ORR,
-            0b1101 => OpcodeType::MOV,
-            0b1110 => OpcodeType::BIC,
-            0b1111 => OpcodeType::MVN,
-            n => panic!("Unknow opcode 0x{:X}", n),
-        }
-    }
-}
 
-enum ShiftType {
-    LogicalLeft,
-    LogicalRight,
-    ArithmeticRight,
-    RotateRight,
-}
