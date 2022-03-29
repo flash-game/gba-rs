@@ -1,6 +1,6 @@
-use std::ops::Shl;
-use fantasy_util::bit::usize::BitUtil;
 use crate::cpu::reg::Register;
+use fantasy_util::bit::usize::BitUtil;
+use std::ops::Shl;
 
 pub mod branch;
 pub mod branch_exchange;

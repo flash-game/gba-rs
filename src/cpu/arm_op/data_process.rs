@@ -69,6 +69,3 @@ struct InternalBase {
     operand2: u32,
     rd: u8,
 }
-
-
-
