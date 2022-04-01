@@ -25,7 +25,7 @@ impl SingleDataSwap {
         };
         // // If it is not a byte operation then force word align
         // let addr = reg.reg_val(rn) & !((1 - if b { 1 } else { 2 }) * 3);
-        // let addr_val = if b { addr_bus.get_byte(addr) as u32 } else { addr_bus.get_word(addr) };
+        // let addr_val = if b { addr_bus.get_byte(addr ) as u32 } else { addr_bus.get_word(addr) };
 
         reg.set_reg(rd, rn_addr_val);
     }
