@@ -68,9 +68,9 @@ pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
     } else {
         instruct.extract(7, 5)
     };
-    let i = match shift_type {
-        0b00 => rm_val << shift_amount,
-        0b01 => rm_val >> shift_amount,
+    let (result, cpsr_c) = match shift_type {
+        0b00 => logical_left(rm_val, shift_amount, reg),
+        0b01 => logical_right(rm_val, shift_amount),
         0b10 => ((rm_val as i32) >> shift_amount) as u32,
         0b11 => rm_val.rotate_right(shift_amount),
         _ => unreachable!(),
@@ -79,10 +79,16 @@ pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
 
 /// 逻辑左移
 fn logical_left(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, bool) {
-    let result = rm_val << shift_amount;
     match shift_amount {
-        0 => (result, reg.cpsr.flag_c()),
-        32 => (result, rm_val.get_bit_bool(31)),
-        _ => (result, result >> shift_amount == rm_val)
+        0 => (rm_val, reg.cpsr.flag_c()),
+        _ => (rm_val << shift_amount, ((rm_val >> (32 - shift_amount)) & 0b1) == 1)
+    }
+}
+
+/// 逻辑左移
+fn logical_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
+    match shift_amount {
+        0 => (0, rm_val.get_bit_bool(31)),
+        _ => (rm_val >> shift_amount, ((rm_val >> (shift_amount - 1)) & 0b1) == 1)
     }
 }
