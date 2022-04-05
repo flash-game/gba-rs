@@ -58,6 +58,14 @@ pub mod undefined;
 /// 预期对应于 LSR #0 的移位字段的形式用于编码 LSR #32，其结果为零，Rm 的第 31 位作为进位输出。
 /// 逻辑右移零是多余的，因为它与逻辑左移零相同，因此汇编器会将 LSR #0（以及 ASR #0 和 ROR #0）转换为 LSL #0，并允许指定 LSR #32。
 /// 算术右移 (ASR) 类似于逻辑右移，不同之处在于高位用 Rm 的第 31 位而不是零填充。 这保留了 2 的补码表示法中的符号。 例如，ASR #5 显示在➲图 4-8：算术右移。
+///
+/// ###
+/// 预期会给出 ASR #0 的移位字段的形式用于编码 ASR #32。
+/// Rm 的第 31 位再次用作进位输出，操作数 2 的每一位也等于 Rm 的第 31 位。
+/// 因此，根据 Rm 的第 31 位的值，结果是全 1 或全 0。
+///
+/// 右移 (ROR) 操作通过在结果的高端重新引入它们来重用逻辑右移操作中“过冲”的位，而不是用于填充逻辑右操作中高端的零。
+/// 例如，ROR #5 显示在➲图 4-9：第 4-14 页右转。
 pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
     let rm = (instruct & 0b1111) as u8;
     let rm_val = reg.reg_val(rm);
@@ -71,7 +79,7 @@ pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
     let (result, cpsr_c) = match shift_type {
         0b00 => logical_left(rm_val, shift_amount, reg),
         0b01 => logical_right(rm_val, shift_amount),
-        0b10 => ((rm_val as i32) >> shift_amount) as u32,
+        0b10 => arithmetic_shift_right(rm_val, shift_amount),
         0b11 => rm_val.rotate_right(shift_amount),
         _ => unreachable!(),
     };
@@ -90,5 +98,15 @@ fn logical_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     match shift_amount {
         0 => (0, rm_val.get_bit_bool(31)),
         _ => (rm_val >> shift_amount, ((rm_val >> (shift_amount - 1)) & 0b1) == 1)
+    }
+}
+
+fn arithmetic_shift_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
+    match shift_amount {
+        0 => match rm_val.get_bit_bool(31) {
+            true => (u32::MAX, true),
+            false => (0, false)
+        },
+        _ => (((rm_val as i32) >> shift_amount) as u32, ((rm_val >> (shift_amount - 1)) & 0b1) == 1),
     }
 }
