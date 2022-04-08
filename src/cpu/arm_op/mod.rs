@@ -64,9 +64,13 @@ pub mod undefined;
 /// Rm 的第 31 位再次用作进位输出，操作数 2 的每一位也等于 Rm 的第 31 位。
 /// 因此，根据 Rm 的第 31 位的值，结果是全 1 或全 0。
 ///
-/// 右移 (ROR) 操作通过在结果的高端重新引入它们来重用逻辑右移操作中“过冲”的位，而不是用于填充逻辑右操作中高端的零。
+/// 循环右移 (ROR) 操作通过在结果的高位重新引入它们来重用逻辑右移操作中“过冲”的位，而不是用于填充逻辑右操作中高位的零。
 /// 例如，ROR #5 显示在➲图 4-9：第 4-14 页右转。
-pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
+///
+/// ###
+/// 可能会给出 ROR #0 的移位字段的形式用于编码桶形移位器的特殊功能，即右旋转扩展 (RRX)。
+/// 这是将 CPSR C 标志附加到 Rm 内容的最高有效端形成的 33 位量的右移一位位置，如 ➲ 图 4-10：右移扩展
+pub fn barrel_shifter(instruct: u32, reg: &mut Register) -> (u32, bool) {
     let rm = (instruct & 0b1111) as u8;
     let rm_val = reg.reg_val(rm);
     let shift_type = instruct.extract(5, 2) as u8;
@@ -76,13 +80,13 @@ pub fn barrel_shifter(instruct: u32, reg: &mut Register) {
     } else {
         instruct.extract(7, 5)
     };
-    let (result, cpsr_c) = match shift_type {
+    match shift_type {
         0b00 => logical_left(rm_val, shift_amount, reg),
         0b01 => logical_right(rm_val, shift_amount),
         0b10 => arithmetic_shift_right(rm_val, shift_amount),
-        0b11 => rm_val.rotate_right(shift_amount),
+        0b11 => rotate_right(rm_val, shift_amount, reg),
         _ => unreachable!(),
-    };
+    }
 }
 
 /// 逻辑左移
@@ -101,6 +105,7 @@ fn logical_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     }
 }
 
+/// 算术右移
 fn arithmetic_shift_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     match shift_amount {
         0 => match rm_val.get_bit_bool(31) {
@@ -108,5 +113,13 @@ fn arithmetic_shift_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
             false => (0, false)
         },
         _ => (((rm_val as i32) >> shift_amount) as u32, ((rm_val >> (shift_amount - 1)) & 0b1) == 1),
+    }
+}
+
+/// 循环右移
+fn rotate_right(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, bool) {
+    match shift_amount {
+        0 => ((rm_val >> 1) | (if reg.cpsr.flag_c() { 1u32 << 31 } else { 0 }), rm_val & 1 == 1),
+        _ => (rm_val.rotate_right(shift_amount), ((rm_val >> (shift_amount - 1)) & 1) == 1),
     }
 }
