@@ -93,7 +93,7 @@ pub fn barrel_shifter(instruct: u32, reg: &mut Register) -> (u32, bool) {
 fn logical_left(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, bool) {
     match shift_amount {
         0 => (rm_val, reg.cpsr.flag_c()),
-        _ => (rm_val << shift_amount, ((rm_val >> (32 - shift_amount)) & 0b1) == 1)
+        _ => (rm_val << shift_amount, ((rm_val >> (32 - shift_amount)) & 0b1) == 1),
     }
 }
 
@@ -101,7 +101,7 @@ fn logical_left(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, boo
 fn logical_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     match shift_amount {
         0 => (0, rm_val.get_bit_bool(31)),
-        _ => (rm_val >> shift_amount, ((rm_val >> (shift_amount - 1)) & 0b1) == 1)
+        _ => (rm_val >> shift_amount, ((rm_val >> (shift_amount - 1)) & 0b1) == 1),
     }
 }
 
@@ -110,16 +110,22 @@ fn arithmetic_shift_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     match shift_amount {
         0 => match rm_val.get_bit_bool(31) {
             true => (u32::MAX, true),
-            false => (0, false)
+            false => (0, false),
         },
-        _ => (((rm_val as i32) >> shift_amount) as u32, ((rm_val >> (shift_amount - 1)) & 0b1) == 1),
+        _ => (
+            ((rm_val as i32) >> shift_amount) as u32,
+            ((rm_val >> (shift_amount - 1)) & 0b1) == 1,
+        ),
     }
 }
 
 /// 循环右移
 fn rotate_right(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, bool) {
     match shift_amount {
-        0 => ((rm_val >> 1) | (if reg.cpsr.flag_c() { 1u32 << 31 } else { 0 }), rm_val & 1 == 1),
+        0 => (
+            (rm_val >> 1) | (if reg.cpsr.flag_c() { 1u32 << 31 } else { 0 }),
+            rm_val & 1 == 1,
+        ),
         _ => (rm_val.rotate_right(shift_amount), ((rm_val >> (shift_amount - 1)) & 1) == 1),
     }
 }

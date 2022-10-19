@@ -1,5 +1,6 @@
-use fantasy_util::bit::usize::BitUtil;
 use std::sync::{Arc, Mutex};
+
+use fantasy_util::bit::usize::BitUtil;
 
 mod cpu;
 mod gba;

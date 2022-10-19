@@ -1,5 +1,6 @@
-use crate::cpu::reg::Register;
 use fantasy_util::bit::usize::BitUtil;
+
+use crate::cpu::reg::Register;
 
 pub struct CoprocessorDataTransfers {}
 
