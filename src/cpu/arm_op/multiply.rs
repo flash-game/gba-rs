@@ -23,3 +23,6 @@ impl Multiply {
         }
     }
 }
+
+#[test]
+fn multiply_test() {}

@@ -17,3 +17,24 @@ impl Branch {
         }
     }
 }
+
+
+#[test]
+fn b_test() {
+    let instruct = 0b1110_1011_0000_0000_0000_0000_1111_1111u32;
+    let mut reg = Register::new();
+    let old_pc = 0;
+    Branch::execute(instruct, &mut reg, old_pc, false);
+    assert_eq!(reg.get_pc(), 0b0000_0000_0000_0000_0000_0100_0000_0100);
+    assert_eq!(reg.get_lr(), 0);
+}
+
+#[test]
+fn bl_test() {
+    let instruct = 0b1110_1011_0000_0000_0000_0000_1111_1111u32;
+    let mut reg = Register::new();
+    let old_pc = 0;
+    Branch::execute(instruct, &mut reg, old_pc, true);
+    assert_eq!(reg.get_pc(), 0b0000_0000_0000_0000_0000_0100_0000_0100);
+    assert_eq!(reg.get_lr(), 0b0000_0000_0000_0000_0000_0000_0000_0100);
+}

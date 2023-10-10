@@ -1,3 +1,47 @@
+pub type RegNum = u8;
+
+pub const R0: RegNum = 0;
+pub const R1: RegNum = 1;
+pub const R2: RegNum = 2;
+pub const R3: RegNum = 3;
+pub const R4: RegNum = 4;
+pub const R5: RegNum = 5;
+pub const R6: RegNum = 6;
+pub const R7: RegNum = 7;
+
+pub const R8: RegNum = 8;
+pub const R8_FIQ: RegNum = 8;
+
+pub const R9: RegNum = 9;
+pub const R9_FIQ: RegNum = 9;
+
+pub const R10: RegNum = 10;
+pub const R10_FIQ: RegNum = 10;
+
+pub const R11: RegNum = 11;
+pub const R11_FIQ: RegNum = 11;
+
+pub const R12: RegNum = 12;
+pub const R12_FIQ: RegNum = 12;
+
+pub const R13: RegNum = 13;
+pub const R13_FIQ: RegNum = 13;
+pub const R13_SVC: RegNum = 13;
+pub const R13_ABT: RegNum = 13;
+pub const R13_IRQ: RegNum = 13;
+pub const R13_UND: RegNum = 13;
+
+pub const R14: RegNum = 14;
+pub const R14_FIQ: RegNum = 14;
+pub const R14_SVC: RegNum = 14;
+pub const R14_ABT: RegNum = 14;
+pub const R14_IRQ: RegNum = 14;
+pub const R14_UND: RegNum = 14;
+
+pub const R15: RegNum = 15;
+pub const PC: RegNum = 15;
+
+
 pub struct Register {
     /// Register 0 - 7
     common_reg: [u32; 8],
@@ -43,9 +87,6 @@ impl Register {
     }
 
     pub fn set_pc(&mut self, pc: u32) {
-        if (pc & 0xFFFF_FFFC) != 0x0000_0000 {
-            panic!("Error PC value 0x{:X}", pc);
-        }
         self.r15 = pc
     }
 
@@ -98,7 +139,7 @@ impl Register {
 
     /// Set Register value with rn number
     /// Such as : rn=0 val=0xFFFF , r0=0xFFFF.
-    pub fn set_reg(&mut self, rn: u8, val: u32) {
+    pub fn set_reg(&mut self, rn: RegNum, val: u32) {
         match rn {
             0x0..=0x7 => self.common_reg[rn as usize] = val,
             0x8..=0xC => match self.cpsr.mode {
@@ -186,6 +227,7 @@ impl Register {
     }
 }
 
+#[derive(PartialEq, Debug)]
 pub enum OpType {
     Thumb = 1,
     ARM = 0,
@@ -336,8 +378,8 @@ impl CPSR {
         }
     }
 
-    pub fn mode(&self) -> &Mode {
-        &self.mode
+    pub fn mode(&self) -> Mode {
+        self.mode
     }
 
     /// 设置当前处理器模式
