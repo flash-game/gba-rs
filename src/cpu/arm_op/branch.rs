@@ -31,10 +31,10 @@ fn b_test() {
 
 #[test]
 fn bl_test() {
-    let instruct = 0b1110_1011_0000_0000_0000_0000_1111_1111u32;
+    let instruct = 0b1110_1011_1111_1111_1111_1111_1111_1000u32;
     let mut reg = Register::new();
-    let old_pc = 0;
+    let old_pc = 0b0000_0000_0000_0000_0000_1000_0000_0000;
     Branch::execute(instruct, &mut reg, old_pc, true);
-    assert_eq!(reg.get_pc(), 0b0000_0000_0000_0000_0000_0100_0000_0100);
-    assert_eq!(reg.get_lr(), 0b0000_0000_0000_0000_0000_0000_0000_0100);
+    assert_eq!(reg.get_pc(), 0b0000_0000_0000_0000_0000_0111_1110_1000);
+    assert_eq!(reg.get_lr(), 0b0000_0000_0000_0000_0000_1000_0000_0100);
 }

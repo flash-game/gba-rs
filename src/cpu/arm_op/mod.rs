@@ -97,7 +97,7 @@ fn logical_left(rm_val: u32, shift_amount: u32, reg: &mut Register) -> (u32, boo
     }
 }
 
-/// 逻辑左移
+/// 逻辑右移
 fn logical_right(rm_val: u32, shift_amount: u32) -> (u32, bool) {
     match shift_amount {
         0 => (0, rm_val.get_bit_bool(31)),
