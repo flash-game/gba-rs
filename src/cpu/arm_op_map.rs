@@ -1,4 +1,4 @@
-use crate::cpu::opcode_map::ArmOpType::{
+use crate::cpu::arm_op_map::ArmOpType::{
     Undef__, ADCS___, ADC____, ADDS___, ADD____, ANDS___, AND____, BICS___, BIC____, BL_____, BX_____, B______, CDP____, CMNS___,
     CMPS___, EORS___, EOR____, LDC____, LDMDA__, LDMDB__, LDMIA__, LDMIB__, LDRBT__, LDRB___, LDRH___, LDRSB__, LDRSH__, LDRT___,
     LDR____, MCR____, MLAS___, MLA____, MOVS___, MOV____, MRC____, MRS____, MSR____, MULS___, MUL____, MVNS___, MVN____, ORRS___,
@@ -6,8 +6,6 @@ use crate::cpu::opcode_map::ArmOpType::{
     STMIA__, STMIB__, STRBT__, STRB___, STRH___, STRT___, STR____, SUBS___, SUB____, SWI____, SWPB___, SWP____, TEQS___, TSTS___,
     UMLALS_, UMLAL__, UMULLS_, UMULL__,
 };
-
-pub fn select_instruct() {}
 
 #[derive(Copy, Clone)]
 pub enum ArmOpType {

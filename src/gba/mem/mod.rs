@@ -1,6 +1,6 @@
 use crate::cpu::mem::Memory;
 
-mod mem;
+pub mod mem;
 
 /// 只读地址
 struct RoAddr {
