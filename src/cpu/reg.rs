@@ -384,7 +384,7 @@ impl CPSR {
 
     /// 设置当前处理器模式
     pub fn set_mode(&mut self, mode: Mode) {
-        let mode_u32 = (mode as u32).clone();
+        let mode_u32 = mode as u32;
         self.cpsr_val = self.cpsr_val & 0xFFFF_FFE0 | mode_u32;
         self.mode = mode;
         match self.op_status() {

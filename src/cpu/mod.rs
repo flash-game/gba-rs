@@ -1,6 +1,6 @@
 mod addrbus;
 mod arm;
 mod arm_op;
-mod arm_op_table;
+mod opcode_map;
 pub mod mem;
 mod reg;

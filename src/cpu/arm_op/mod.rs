@@ -16,6 +16,7 @@ pub mod singledata_transfer;
 pub mod software_interrupt;
 pub mod swp;
 pub mod undefined;
+mod psr_transfer;
 
 /// 桶形移位器
 /// ```

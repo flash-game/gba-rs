@@ -10,7 +10,7 @@ use crate::cpu::arm_op::multiply_long::MultiplyLong;
 use crate::cpu::arm_op::software_interrupt::SoftwareInterrupt;
 use crate::cpu::arm_op::swp::SingleDataSwap;
 use crate::cpu::arm_op::undefined::Undefined;
-use crate::cpu::arm_op_table::{ArmOpType, TABLE};
+use crate::cpu::opcode_map::{ArmOpType, ARM_MAP};
 use crate::cpu::mem::Memory;
 use crate::cpu::reg::Register;
 
@@ -146,5 +146,5 @@ impl<'a> Arm7<'a> {
 fn get_instruction_type(op: u32) -> ArmOpType {
     let b47 = op.extract(4, 4) as usize;
     let b2027 = op.extract(20, 8) as usize;
-    (TABLE[b2027])[b47]
+    (ARM_MAP[b2027])[b47]
 }

@@ -1,4 +1,4 @@
-use crate::cpu::arm_op_table::ArmOpType::{
+use crate::cpu::opcode_map::ArmOpType::{
     Undef__, ADCS___, ADC____, ADDS___, ADD____, ANDS___, AND____, BICS___, BIC____, BL_____, BX_____, B______, CDP____, CMNS___,
     CMPS___, EORS___, EOR____, LDC____, LDMDA__, LDMDB__, LDMIA__, LDMIB__, LDRBT__, LDRB___, LDRH___, LDRSB__, LDRSH__, LDRT___,
     LDR____, MCR____, MLAS___, MLA____, MOVS___, MOV____, MRC____, MRS____, MSR____, MULS___, MUL____, MVNS___, MVN____, ORRS___,
@@ -92,7 +92,7 @@ pub enum ArmOpType {
 }
 
 #[rustfmt::skip]
-pub const TABLE: [[ArmOpType; 16]; 256] = [
+pub const ARM_MAP: [[ArmOpType; 16]; 256] = [
     [AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, AND____, MUL____, AND____, STRH___, AND____, Undef__, AND____, Undef__],  // 0
     [ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, ANDS___, MULS___, ANDS___, LDRH___, ANDS___, LDRSB__, ANDS___, LDRSH__],  // 1
     [EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, EOR____, MLA____, EOR____, STRH___, EOR____, Undef__, EOR____, Undef__],  // 2
