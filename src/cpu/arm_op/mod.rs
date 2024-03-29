@@ -1,5 +1,3 @@
-use std::ops::Shl;
-
 use fantasy_util::bit::usize::BitUtil;
 
 use crate::cpu::reg::Register;

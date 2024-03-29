@@ -10,7 +10,7 @@ use crate::cpu::arm_op::multiply_long::MultiplyLong;
 use crate::cpu::arm_op::software_interrupt::SoftwareInterrupt;
 use crate::cpu::arm_op::swp::SingleDataSwap;
 use crate::cpu::arm_op::undefined::Undefined;
-use crate::cpu::arm_op_map::{ArmOpType, ARM_MAP};
+use crate::cpu::arm_op_map::{ARM_MAP, ArmOpType};
 use crate::cpu::mem::Memory;
 use crate::cpu::reg::Register;
 
